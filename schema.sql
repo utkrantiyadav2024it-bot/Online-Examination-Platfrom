@@ -1,667 +1,536 @@
--- ================================================================
--- ONLINE EXAMINATION SYSTEM
--- PHYSICAL DATABASE DESIGN
--- FINAL EXECUTABLE MYSQL 8 SCHEMA
---
--- Target DBMS : MySQL 8.x
--- Engine      : InnoDB
--- Normal Form : 3NF
--- Tables      : 27
--- ================================================================
+-- Online Examination Platform
+-- MySQL 8.0+
+-- Complete database schema based on the provided 17-table design
 
-CREATE DATABASE IF NOT EXISTS online_exam_db;
-
-USE online_exam_db;
+CREATE DATABASE IF NOT EXISTS OnlineExaminationDB;
+USE OnlineExaminationDB;
 
 SET FOREIGN_KEY_CHECKS = 0;
--- ================================================================
--- SECTION 1 : SCHEMA CREATION
--- ================================================================
 
--- ================================================================
--- DOMAIN A — IDENTITY & ACCESS MANAGEMENT
--- ================================================================
--- ================================================================
--- 1. ROLE
--- ================================================================
+DROP VIEW IF EXISTS vw_browser_integrity;
+DROP VIEW IF EXISTS vw_student_performance;
+DROP VIEW IF EXISTS vw_exam_statistics;
+DROP VIEW IF EXISTS vw_student_results;
+DROP VIEW IF EXISTS vw_question_paper;
 
-CREATE TABLE IF NOT EXISTS Role (
-    roleId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    roleName VARCHAR(50) NOT NULL UNIQUE,
-    description VARCHAR(255) NULL,
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT NULL,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_role_name_len CHECK (CHAR_LENGTH(roleName) >= 3)
+DROP TABLE IF EXISTS AuditLog;
+DROP TABLE IF EXISTS Notification;
+DROP TABLE IF EXISTS Result;
+DROP TABLE IF EXISTS StudentAnswer;
+DROP TABLE IF EXISTS ExamAttempt;
+DROP TABLE IF EXISTS CandidateRegistration;
+DROP TABLE IF EXISTS ExamQuestion;
+DROP TABLE IF EXISTS QuestionOption;
+DROP TABLE IF EXISTS Question;
+DROP TABLE IF EXISTS ExamSchedule;
+DROP TABLE IF EXISTS Exam;
+DROP TABLE IF EXISTS Subject;
+DROP TABLE IF EXISTS Faculty;
+DROP TABLE IF EXISTS Student;
+DROP TABLE IF EXISTS Department;
+DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS Role;
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- 1. Role
+CREATE TABLE Role (
+    RoleID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    RoleName VARCHAR(30) NOT NULL UNIQUE,
+    Description VARCHAR(255),
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE
 ) ENGINE=InnoDB;
 
-
--- ================================================================
--- 2. PERMISSION
--- ================================================================
-
-CREATE TABLE IF NOT EXISTS Permission (
-    permissionId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    permissionName VARCHAR(100) NOT NULL,
-    moduleName VARCHAR(50) NOT NULL,
-    description VARCHAR(255) NULL,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_perm_module UNIQUE (permissionName, moduleName),
-    CONSTRAINT chk_perm_name_len CHECK (CHAR_LENGTH(permissionName) > 2)
+-- 2. User
+CREATE TABLE User (
+    UserID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    RoleID BIGINT NOT NULL,
+    FirstName VARCHAR(50) NOT NULL,
+    LastName VARCHAR(50) NOT NULL,
+    Email VARCHAR(255) NOT NULL UNIQUE,
+    Phone VARCHAR(15) UNIQUE,
+    PasswordHash VARCHAR(255) NOT NULL,
+    IsActive BOOLEAN NOT NULL DEFAULT TRUE,
+    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UpdatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_role
+        FOREIGN KEY (RoleID) REFERENCES Role(RoleID)
+        ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 3. ROLE_PERMISSION
--- ================================================================
+CREATE INDEX idx_user_role ON User(RoleID);
+CREATE INDEX idx_user_email ON User(Email);
 
-CREATE TABLE IF NOT EXISTS RolePermission (
-    rolePermissionId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    roleId BIGINT NOT NULL,
-    permissionId BIGINT NOT NULL,
-    grantedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    grantedBy BIGINT NULL,
-    CONSTRAINT uq_role_perm UNIQUE (roleId, permissionId),
-    CONSTRAINT fk_rp_role FOREIGN KEY (roleId) REFERENCES Role(roleId) ON DELETE CASCADE,
-    CONSTRAINT fk_rp_perm FOREIGN KEY (permissionId) REFERENCES Permission(permissionId) ON DELETE CASCADE
+-- 3. Department
+CREATE TABLE Department (
+    DepartmentID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    DepartmentCode VARCHAR(20) NOT NULL UNIQUE,
+    DepartmentName VARCHAR(100) NOT NULL UNIQUE,
+    Description VARCHAR(255),
+    IsActive BOOLEAN DEFAULT TRUE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 4. USER
--- ================================================================
-
-CREATE TABLE IF NOT EXISTS User (
-    userId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    firstName VARCHAR(50) NOT NULL,
-    lastName VARCHAR(50) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(15) NULL UNIQUE,
-    passwordHash TEXT NOT NULL,
-    roleId BIGINT NOT NULL,
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    lastLogin DATETIME NULL,
-    failedLoginAttempts INT NOT NULL DEFAULT 0,
-    accountLocked BOOLEAN NOT NULL DEFAULT FALSE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT NULL,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_failed_attempts CHECK (failedLoginAttempts >= 0),
-    CONSTRAINT fk_user_role FOREIGN KEY (roleId) REFERENCES Role(roleId) ON DELETE RESTRICT,
-    CONSTRAINT fk_user_created FOREIGN KEY (createdBy) REFERENCES User(userId) ON DELETE SET NULL,
-    CONSTRAINT fk_user_updated FOREIGN KEY (updatedBy) REFERENCES User(userId) ON DELETE SET NULL
+-- 4. Student
+CREATE TABLE Student (
+    StudentID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT NOT NULL UNIQUE,
+    DepartmentID BIGINT NOT NULL,
+    RollNumber VARCHAR(30) NOT NULL UNIQUE,
+    EnrollmentNumber VARCHAR(30) NOT NULL UNIQUE,
+    Year SMALLINT NOT NULL,
+    Semester SMALLINT NOT NULL,
+    IsActive BOOLEAN DEFAULT TRUE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_student_user
+        FOREIGN KEY (UserID) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_student_department
+        FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT chk_student_year CHECK (Year > 0),
+    CONSTRAINT chk_student_semester CHECK (Semester > 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 5. UserSession 
--- ================================================================
+CREATE INDEX idx_student_department ON Student(DepartmentID);
 
-CREATE TABLE IF NOT EXISTS UserSession (
-    sessionId VARCHAR(36) PRIMARY KEY,
-    userId BIGINT NOT NULL,
-    loginTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    logoutTime DATETIME NULL,
-    ipAddress VARCHAR(45) NOT NULL,
-    userAgent TEXT NULL,
-    deviceType VARCHAR(30) NULL,
-    sessionStatus VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
-    expiresAt DATETIME NOT NULL,
-    CONSTRAINT chk_session_status CHECK (sessionStatus IN ('ACTIVE', 'EXPIRED', 'LOGGED_OUT', 'INVALIDATED')),
-    CONSTRAINT fk_session_user FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE
+-- 5. Faculty
+CREATE TABLE Faculty (
+    FacultyID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT NOT NULL UNIQUE,
+    DepartmentID BIGINT NOT NULL,
+    EmployeeID VARCHAR(30) NOT NULL UNIQUE,
+    Designation VARCHAR(50),
+    IsActive BOOLEAN DEFAULT TRUE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_faculty_user
+        FOREIGN KEY (UserID) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_faculty_department
+        FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+        ON UPDATE CASCADE ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 6. LoginHistory
--- ================================================================
+CREATE INDEX idx_faculty_department ON Faculty(DepartmentID);
 
-CREATE TABLE IF NOT EXISTS LoginHistory (
-    loginHistoryId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    userId BIGINT NOT NULL,
-    loginTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    logoutTime DATETIME NULL,
-    ipAddress VARCHAR(45) NOT NULL,
-    userAgent TEXT NULL,
-    loginStatus VARCHAR(20) NOT NULL,
-    failureReason VARCHAR(255) NULL,
-    authenticationMethod VARCHAR(30) NOT NULL DEFAULT 'PASSWORD',
-    CONSTRAINT chk_login_status CHECK (loginStatus IN ('SUCCESS', 'FAILED', 'LOCKED')),
-    CONSTRAINT chk_auth_method CHECK (authenticationMethod IN ('PASSWORD', 'OTP', 'SSO')),
-    CONSTRAINT fk_login_user FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE RESTRICT
+-- 6. Subject
+CREATE TABLE Subject (
+    SubjectID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    DepartmentID BIGINT NOT NULL,
+    SubjectCode VARCHAR(20) NOT NULL UNIQUE,
+    SubjectName VARCHAR(100) NOT NULL,
+    Description TEXT,
+    Credits SMALLINT DEFAULT 0,
+    IsActive BOOLEAN DEFAULT TRUE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CreatedBy BIGINT NULL,
+    CONSTRAINT fk_subject_department
+        FOREIGN KEY (DepartmentID) REFERENCES Department(DepartmentID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_subject_createdby
+        FOREIGN KEY (CreatedBy) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT chk_subject_credits CHECK (Credits >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- DOMAIN B — ACADEMIC & EXAMINATION MANAGEMENT
--- ================================================================
+CREATE INDEX idx_subject_department ON Subject(DepartmentID);
 
--- ================================================================
--- 7. Subject
--- ===============================================================
-CREATE TABLE IF NOT EXISTS Subject (
-    subjectId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    subjectCode VARCHAR(20) NOT NULL UNIQUE,
-    subjectName VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT NULL,
-    credits SMALLINT NULL,
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT NULL,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_credits CHECK (credits >= 0),
-    CONSTRAINT fk_sub_created FOREIGN KEY (createdBy) REFERENCES User(userId) ON DELETE SET NULL,
-    CONSTRAINT fk_sub_updated FOREIGN KEY (updatedBy) REFERENCES User(userId) ON DELETE SET NULL
+-- 7. Exam
+CREATE TABLE Exam (
+    ExamID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    SubjectID BIGINT NOT NULL,
+    CreatedBy BIGINT NOT NULL,
+    ExamCode VARCHAR(30) NOT NULL UNIQUE,
+    ExamTitle VARCHAR(150) NOT NULL,
+    ExamType VARCHAR(30) NOT NULL,
+    TotalMarks DECIMAL(6,2) NOT NULL,
+    PassingMarks DECIMAL(6,2) NOT NULL,
+    DurationMinutes INT NOT NULL,
+    Instructions TEXT,
+    MaximumAttempts SMALLINT NOT NULL DEFAULT 1,
+    ShuffleQuestions BOOLEAN DEFAULT TRUE,
+    ShuffleOptions BOOLEAN DEFAULT TRUE,
+    NegativeMarking BOOLEAN DEFAULT FALSE,
+    NegativeMarksPerQuestion DECIMAL(5,2) DEFAULT 0,
+    ExamStatus ENUM('DRAFT','SCHEDULED','ACTIVE','COMPLETED','CANCELLED') NOT NULL DEFAULT 'DRAFT',
+    IsActive BOOLEAN DEFAULT TRUE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_exam_subject
+        FOREIGN KEY (SubjectID) REFERENCES Subject(SubjectID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_exam_createdby
+        FOREIGN KEY (CreatedBy) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT chk_exam_total_marks CHECK (TotalMarks > 0),
+    CONSTRAINT chk_exam_passing_marks CHECK (PassingMarks >= 0 AND PassingMarks <= TotalMarks),
+    CONSTRAINT chk_exam_duration CHECK (DurationMinutes > 0),
+    CONSTRAINT chk_exam_attempts CHECK (MaximumAttempts >= 1),
+    CONSTRAINT chk_exam_negative_marks CHECK (NegativeMarksPerQuestion >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 8. Exam
--- ================================================================
-CREATE TABLE IF NOT EXISTS Exam (
-    examId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    subjectId BIGINT NOT NULL,
-    examCode VARCHAR(30) NOT NULL UNIQUE,
-    examTitle VARCHAR(150) NOT NULL,
-    examType VARCHAR(30) NOT NULL,
-    totalMarks DECIMAL(6,2) NOT NULL,
-    passingMarks DECIMAL(6,2) NOT NULL,
-    durationMinutes INT NOT NULL,
-    instructions TEXT NULL,
-    maximumAttempts SMALLINT NOT NULL DEFAULT 1,
-    shuffleQuestions BOOLEAN NOT NULL DEFAULT TRUE,
-    shuffleOptions BOOLEAN NOT NULL DEFAULT TRUE,
-    negativeMarking BOOLEAN NOT NULL DEFAULT FALSE,
-    negativeMarksPerQuestion DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    examStatus VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT NULL,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_exam_marks CHECK (totalMarks > 0 AND passingMarks >= 0 AND passingMarks <= totalMarks),
-    CONSTRAINT chk_exam_duration CHECK (durationMinutes > 0),
-    CONSTRAINT chk_exam_attempts CHECK (maximumAttempts >= 1),
-    CONSTRAINT chk_exam_neg_marks CHECK (negativeMarksPerQuestion >= 0),
-    CONSTRAINT chk_exam_status CHECK (examStatus IN ('DRAFT', 'SCHEDULED', 'ACTIVE', 'COMPLETED', 'CANCELLED')),
-    CONSTRAINT fk_exam_subject FOREIGN KEY (subjectId) REFERENCES Subject(subjectId) ON DELETE RESTRICT,
-    CONSTRAINT fk_exam_created FOREIGN KEY (createdBy) REFERENCES User(userId) ON DELETE SET NULL,
-    CONSTRAINT fk_exam_updated FOREIGN KEY (updatedBy) REFERENCES User(userId) ON DELETE SET NULL
+CREATE INDEX idx_exam_subject ON Exam(SubjectID);
+CREATE INDEX idx_exam_createdby ON Exam(CreatedBy);
+CREATE INDEX idx_exam_status ON Exam(ExamStatus);
+
+-- 8. ExamSchedule
+CREATE TABLE ExamSchedule (
+    ScheduleID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ExamID BIGINT NOT NULL,
+    StartTime DATETIME NOT NULL,
+    EndTime DATETIME NOT NULL,
+    RegistrationStart DATETIME NULL,
+    RegistrationEnd DATETIME NULL,
+    LateEntryMinutes INT DEFAULT 0,
+    ScheduleStatus ENUM('SCHEDULED','ONGOING','COMPLETED','CANCELLED') NOT NULL DEFAULT 'SCHEDULED',
+    CONSTRAINT fk_schedule_exam
+        FOREIGN KEY (ExamID) REFERENCES Exam(ExamID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT chk_schedule_time CHECK (EndTime > StartTime),
+    CONSTRAINT chk_registration_time CHECK (
+        RegistrationStart IS NULL OR RegistrationEnd IS NULL OR RegistrationEnd >= RegistrationStart
+    ),
+    CONSTRAINT chk_late_entry CHECK (LateEntryMinutes >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 9.  ExamSchedule
--- ================================================================
+CREATE INDEX idx_schedule_exam ON ExamSchedule(ExamID);
+CREATE INDEX idx_schedule_start ON ExamSchedule(StartTime);
 
-CREATE TABLE IF NOT EXISTS ExamSchedule (
-    scheduleId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    examId BIGINT NOT NULL,
-    startTime DATETIME NOT NULL,
-    endTime DATETIME NOT NULL,
-    registrationStart DATETIME NULL,
-    registrationEnd DATETIME NULL,
-    lateEntryMinutes INT NOT NULL DEFAULT 0,
-    autoSubmit BOOLEAN NOT NULL DEFAULT TRUE,
-    scheduleStatus VARCHAR(20) NOT NULL DEFAULT 'SCHEDULED',
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT chk_sched_times CHECK (endTime > startTime),
-    CONSTRAINT chk_sched_reg_times CHECK (registrationEnd IS NULL OR registrationStart IS NULL OR registrationEnd >= registrationStart),
-    CONSTRAINT chk_sched_late_entry CHECK (lateEntryMinutes >= 0),
-    CONSTRAINT chk_sched_status CHECK (scheduleStatus IN ('SCHEDULED', 'ONGOING', 'COMPLETED', 'CANCELLED')),
-    CONSTRAINT fk_sched_exam FOREIGN KEY (examId) REFERENCES Exam(examId) ON DELETE CASCADE
+-- 9. Question
+CREATE TABLE Question (
+    QuestionID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    SubjectID BIGINT NOT NULL,
+    CreatedBy BIGINT NOT NULL,
+    QuestionType ENUM('MCQ','MSQ','TRUE_FALSE','SHORT_ANSWER','DESCRIPTIVE') NOT NULL,
+    QuestionText TEXT NOT NULL,
+    Explanation TEXT,
+    DefaultMarks DECIMAL(5,2) NOT NULL,
+    NegativeMarks DECIMAL(5,2) DEFAULT 0,
+    DifficultyLevel ENUM('EASY','MEDIUM','HARD') NOT NULL,
+    IsActive BOOLEAN DEFAULT TRUE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_question_subject
+        FOREIGN KEY (SubjectID) REFERENCES Subject(SubjectID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_question_createdby
+        FOREIGN KEY (CreatedBy) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT chk_question_marks CHECK (DefaultMarks > 0),
+    CONSTRAINT chk_question_negative_marks CHECK (NegativeMarks >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 10.CandidateRegistration
--- ================================================================
+CREATE INDEX idx_question_subject ON Question(SubjectID);
+CREATE INDEX idx_question_type ON Question(QuestionType);
 
-
-CREATE TABLE IF NOT EXISTS CandidateRegistration (
-    registrationId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    examId BIGINT NOT NULL,
-    userId BIGINT NOT NULL,
-    registrationTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    registrationStatus VARCHAR(20) NOT NULL DEFAULT 'REGISTERED',
-    eligibilityVerified BOOLEAN NOT NULL DEFAULT FALSE,
-    paymentRequired BOOLEAN NOT NULL DEFAULT FALSE,
-    paymentStatus VARCHAR(20) NOT NULL DEFAULT 'NOT_REQUIRED',
-    remarks VARCHAR(255) NULL,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_exam_user UNIQUE (examId, userId),
-    CONSTRAINT chk_reg_status CHECK (registrationStatus IN ('REGISTERED', 'CANCELLED', 'WAITLISTED')),
-    CONSTRAINT chk_pay_status CHECK (paymentStatus IN ('NOT_REQUIRED', 'PENDING', 'PAID', 'FAILED')),
-    CONSTRAINT fk_cand_exam FOREIGN KEY (examId) REFERENCES Exam(examId) ON DELETE RESTRICT,
-    CONSTRAINT fk_cand_user FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE RESTRICT
+-- 10. QuestionOption
+CREATE TABLE QuestionOption (
+    OptionID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    QuestionID BIGINT NOT NULL,
+    OptionText TEXT NOT NULL,
+    OptionOrder INT NOT NULL,
+    IsCorrect BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_option_question
+        FOREIGN KEY (QuestionID) REFERENCES Question(QuestionID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT uq_question_option_order UNIQUE (QuestionID, OptionOrder),
+    CONSTRAINT chk_option_order CHECK (OptionOrder > 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- DOMAIN c — QUESTION BANK
--- ================================================================
+CREATE INDEX idx_option_question ON QuestionOption(QuestionID);
 
--- ================================================================
--- 11.  QuestionCategory
--- ================================================================
-CREATE TABLE IF NOT EXISTS QuestionCategory (
-    categoryId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    categoryName VARCHAR(100) NOT NULL UNIQUE,
-    description VARCHAR(255) NULL,
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT NULL,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_cat_name_len CHECK (CHAR_LENGTH(categoryName) >= 3),
-    CONSTRAINT fk_cat_created FOREIGN KEY (createdBy) REFERENCES User(userId) ON DELETE SET NULL,
-    CONSTRAINT fk_cat_updated FOREIGN KEY (updatedBy) REFERENCES User(userId) ON DELETE SET NULL
+-- 11. ExamQuestion
+CREATE TABLE ExamQuestion (
+    ExamQuestionID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ExamID BIGINT NOT NULL,
+    QuestionID BIGINT NOT NULL,
+    QuestionOrder INT NOT NULL,
+    Marks DECIMAL(5,2) NOT NULL,
+    NegativeMarks DECIMAL(5,2) DEFAULT 0,
+    IsMandatory BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_examquestion_exam
+        FOREIGN KEY (ExamID) REFERENCES Exam(ExamID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_examquestion_question
+        FOREIGN KEY (QuestionID) REFERENCES Question(QuestionID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT uq_exam_question UNIQUE (ExamID, QuestionID),
+    CONSTRAINT uq_exam_question_order UNIQUE (ExamID, QuestionOrder),
+    CONSTRAINT chk_examquestion_order CHECK (QuestionOrder > 0),
+    CONSTRAINT chk_examquestion_marks CHECK (Marks > 0),
+    CONSTRAINT chk_examquestion_negative CHECK (NegativeMarks >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 12.DifficultyLevel
--- ================================================================
-CREATE TABLE IF NOT EXISTS DifficultyLevel (
-    difficultyLevelId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    levelName VARCHAR(30) NOT NULL UNIQUE,
-    difficultyScore SMALLINT NOT NULL UNIQUE,
-    description VARCHAR(255) NULL,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_diff_score CHECK (difficultyScore BETWEEN 1 AND 10)
+CREATE INDEX idx_examquestion_question ON ExamQuestion(QuestionID);
+
+-- 12. CandidateRegistration
+CREATE TABLE CandidateRegistration (
+    RegistrationID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    ExamID BIGINT NOT NULL,
+    StudentID BIGINT NOT NULL,
+    RegistrationTime DATETIME DEFAULT CURRENT_TIMESTAMP,
+    RegistrationStatus ENUM('REGISTERED','CANCELLED','WAITLISTED') NOT NULL DEFAULT 'REGISTERED',
+    EligibilityVerified BOOLEAN DEFAULT FALSE,
+    Remarks VARCHAR(255),
+    CONSTRAINT fk_registration_exam
+        FOREIGN KEY (ExamID) REFERENCES Exam(ExamID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_registration_student
+        FOREIGN KEY (StudentID) REFERENCES Student(StudentID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT uq_exam_student UNIQUE (ExamID, StudentID)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 13.Question
--- ================================================================
-CREATE TABLE IF NOT EXISTS Question (
-    questionId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    categoryId BIGINT NOT NULL,
-    difficultyLevelId BIGINT NOT NULL,
-    questionType VARCHAR(30) NOT NULL,
-    questionText TEXT NOT NULL,
-    correctAnswer TEXT NULL,
-    explanation TEXT NULL,
-    defaultMarks DECIMAL(5,2) NOT NULL DEFAULT 1.00,
-    negativeMarks DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    estimatedTimeSeconds INT NULL,
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    createdBy BIGINT NULL,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_q_type CHECK (questionType IN ('MCQ', 'MSQ', 'TRUE_FALSE', 'SHORT_ANSWER', 'DESCRIPTIVE', 'CODING')),
-    CONSTRAINT chk_q_marks CHECK (defaultMarks > 0 AND negativeMarks >= 0),
-    CONSTRAINT chk_q_time CHECK (estimatedTimeSeconds IS NULL OR estimatedTimeSeconds > 0),
-    CONSTRAINT fk_q_cat FOREIGN KEY (categoryId) REFERENCES QuestionCategory(categoryId) ON DELETE RESTRICT,
-    CONSTRAINT fk_q_diff FOREIGN KEY (difficultyLevelId) REFERENCES DifficultyLevel(difficultyLevelId) ON DELETE RESTRICT,
-    CONSTRAINT fk_q_created FOREIGN KEY (createdBy) REFERENCES User(userId) ON DELETE SET NULL,
-    CONSTRAINT fk_q_updated FOREIGN KEY (updatedBy) REFERENCES User(userId) ON DELETE SET NULL
-) ENGINE=InnoDB;
--- ================================================================
--- 14.QuestionOption
--- ================================================================
-CREATE TABLE IF NOT EXISTS QuestionOption (
-    optionId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    questionId BIGINT NOT NULL,
-    optionText TEXT NOT NULL,
-    optionOrder INT NOT NULL DEFAULT 1,
-    isCorrect BOOLEAN NOT NULL DEFAULT FALSE,
-    CONSTRAINT fk_opt_q FOREIGN KEY (questionId) REFERENCES Question(questionId) ON DELETE CASCADE
-) ENGINE=InnoDB;
--- ================================================================
--- 15.ExamQuestion
--- ================================================================
-CREATE TABLE IF NOT EXISTS ExamQuestion (
-    examQuestionId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    examId BIGINT NOT NULL,
-    questionId BIGINT NOT NULL,
-    questionOrder INT NOT NULL,
-    marks DECIMAL(5,2) NOT NULL,
-    negativeMarks DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    isMandatory BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_eq_exam_q UNIQUE (examId, questionId),
-    CONSTRAINT uq_eq_exam_order UNIQUE (examId, questionOrder),
-    CONSTRAINT chk_eq_order CHECK (questionOrder > 0),
-    CONSTRAINT chk_eq_marks CHECK (marks > 0 AND negativeMarks >= 0),
-    CONSTRAINT fk_eq_exam FOREIGN KEY (examId) REFERENCES Exam(examId) ON DELETE CASCADE,
-    CONSTRAINT fk_eq_q FOREIGN KEY (questionId) REFERENCES Question(questionId) ON DELETE RESTRICT
+CREATE INDEX idx_registration_student ON CandidateRegistration(StudentID);
+CREATE INDEX idx_registration_exam ON CandidateRegistration(ExamID);
+
+-- 13. ExamAttempt
+CREATE TABLE ExamAttempt (
+    AttemptID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    RegistrationID BIGINT NOT NULL,
+    AttemptNumber SMALLINT NOT NULL,
+    StartTime DATETIME NOT NULL,
+    EndTime DATETIME NULL,
+    SubmittedAt DATETIME NULL,
+    Status ENUM(
+        'NOT_STARTED',
+        'IN_PROGRESS',
+        'SUBMITTED',
+        'AUTO_SUBMITTED',
+        'EVALUATED',
+        'ABANDONED'
+    ) NOT NULL DEFAULT 'NOT_STARTED',
+    TotalTimeSpentSeconds INT DEFAULT 0,
+    IPAddress VARCHAR(45),
+    SubmissionMethod ENUM('MANUAL','AUTO') NULL,
+    AutoSubmitted BOOLEAN DEFAULT FALSE,
+    CONSTRAINT fk_attempt_registration
+        FOREIGN KEY (RegistrationID) REFERENCES CandidateRegistration(RegistrationID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT uq_registration_attempt UNIQUE (RegistrationID, AttemptNumber),
+    CONSTRAINT chk_attempt_number CHECK (AttemptNumber >= 1),
+    CONSTRAINT chk_attempt_time CHECK (TotalTimeSpentSeconds >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- DOMAIN D—  EXAMINATION EXECUTION & RESULTS
--- ================================================================
+CREATE INDEX idx_attempt_registration ON ExamAttempt(RegistrationID);
+CREATE INDEX idx_attempt_status ON ExamAttempt(Status);
 
--- ================================================================
--- 16.  ExamAttempt
--- ================================================================
-CREATE TABLE IF NOT EXISTS ExamAttempt (
-    attemptId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    registrationId BIGINT NOT NULL,
-    attemptNumber SMALLINT NOT NULL DEFAULT 1,
-    startTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    endTime DATETIME NULL,
-    submittedAt DATETIME NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'NOT_STARTED',
-    totalTimeSpentSeconds INT NULL,
-    ipAddress VARCHAR(45) NULL,
-    deviceInfo TEXT NULL,
-    browserInfo TEXT NULL,
-    submissionMethod VARCHAR(30) NOT NULL DEFAULT 'MANUAL',
-    autoSubmitted BOOLEAN NOT NULL DEFAULT FALSE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_attempt_reg_num UNIQUE (registrationId, attemptNumber),
-    CONSTRAINT chk_attempt_num CHECK (attemptNumber > 0),
-    CONSTRAINT chk_attempt_status CHECK (status IN ('NOT_STARTED', 'IN_PROGRESS', 'SUBMITTED', 'AUTO_SUBMITTED', 'EVALUATED', 'ABANDONED')),
-    CONSTRAINT chk_sub_method CHECK (submissionMethod IN ('MANUAL', 'AUTO_TIMEOUT', 'SYSTEM')),
-    CONSTRAINT fk_attempt_reg FOREIGN KEY (registrationId) REFERENCES CandidateRegistration(registrationId) ON DELETE RESTRICT
+-- 14. StudentAnswer
+CREATE TABLE StudentAnswer (
+    AnswerID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    AttemptID BIGINT NOT NULL,
+    QuestionID BIGINT NOT NULL,
+    SelectedOptionID BIGINT NULL,
+    AnswerText TEXT NULL,
+    IsMarkedForReview BOOLEAN DEFAULT FALSE,
+    IsAnswered BOOLEAN DEFAULT FALSE,
+    SubmittedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    TimeSpentSeconds INT DEFAULT 0,
+    CONSTRAINT fk_answer_attempt
+        FOREIGN KEY (AttemptID) REFERENCES ExamAttempt(AttemptID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_answer_question
+        FOREIGN KEY (QuestionID) REFERENCES Question(QuestionID)
+        ON UPDATE CASCADE ON DELETE RESTRICT,
+    CONSTRAINT fk_answer_option
+        FOREIGN KEY (SelectedOptionID) REFERENCES QuestionOption(OptionID)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT uq_attempt_question UNIQUE (AttemptID, QuestionID),
+    CONSTRAINT chk_answer_time CHECK (TimeSpentSeconds >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 17.  Answer
--- ================================================================
+CREATE INDEX idx_answer_question ON StudentAnswer(QuestionID);
+CREATE INDEX idx_answer_option ON StudentAnswer(SelectedOptionID);
 
-CREATE TABLE IF NOT EXISTS Answer (
-    answerId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    attemptId BIGINT NOT NULL,
-    questionId BIGINT NOT NULL,
-    selectedOptionId BIGINT NULL,
-    answerText TEXT NULL,
-    isMarkedForReview BOOLEAN NOT NULL DEFAULT FALSE,
-    isAnswered BOOLEAN NOT NULL DEFAULT FALSE,
-    submittedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    timeSpentSeconds INT NOT NULL DEFAULT 0,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_ans_attempt_q UNIQUE (attemptId, questionId),
-    CONSTRAINT chk_ans_time CHECK (timeSpentSeconds >= 0),
-    CONSTRAINT fk_ans_attempt FOREIGN KEY (attemptId) REFERENCES ExamAttempt(attemptId) ON DELETE CASCADE,
-    CONSTRAINT fk_ans_q FOREIGN KEY (questionId) REFERENCES Question(questionId) ON DELETE RESTRICT,
-    CONSTRAINT fk_ans_opt FOREIGN KEY (selectedOptionId) REFERENCES QuestionOption(optionId) ON DELETE SET NULL
+-- 15. Result
+CREATE TABLE Result (
+    ResultID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    AttemptID BIGINT NOT NULL UNIQUE,
+    TotalMarksObtained DECIMAL(6,2) NOT NULL DEFAULT 0,
+    Percentage DECIMAL(5,2) NOT NULL DEFAULT 0,
+    TotalCorrect INT NOT NULL DEFAULT 0,
+    TotalWrong INT NOT NULL DEFAULT 0,
+    TotalSkipped INT NOT NULL DEFAULT 0,
+    Grade VARCHAR(5),
+    PassStatus BOOLEAN NOT NULL,
+    ResultStatus ENUM('GENERATED','PUBLISHED') NOT NULL DEFAULT 'GENERATED',
+    PublishedAt DATETIME NULL,
+    PublishedBy BIGINT NULL,
+    Remarks TEXT,
+    CONSTRAINT fk_result_attempt
+        FOREIGN KEY (AttemptID) REFERENCES ExamAttempt(AttemptID)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+    CONSTRAINT fk_result_publishedby
+        FOREIGN KEY (PublishedBy) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT chk_result_marks CHECK (TotalMarksObtained >= 0),
+    CONSTRAINT chk_result_percentage CHECK (Percentage >= 0 AND Percentage <= 100),
+    CONSTRAINT chk_result_correct CHECK (TotalCorrect >= 0),
+    CONSTRAINT chk_result_wrong CHECK (TotalWrong >= 0),
+    CONSTRAINT chk_result_skipped CHECK (TotalSkipped >= 0)
 ) ENGINE=InnoDB;
 
--- ================================================================
--- 18.  Evaluation
--- ================================================================
-CREATE TABLE IF NOT EXISTS Evaluation (
-    evaluationId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    attemptId BIGINT NOT NULL UNIQUE,
-    totalMarksObtained DECIMAL(6,2) NOT NULL DEFAULT 0.00,
-    totalCorrect INT NOT NULL DEFAULT 0,
-    totalWrong INT NOT NULL DEFAULT 0,
-    totalSkipped INT NOT NULL DEFAULT 0,
-    evaluationStatus VARCHAR(20) NOT NULL DEFAULT 'PENDING',
-    evaluatedBy BIGINT NULL,
-    evaluatedAt DATETIME NULL,
-    remarks TEXT NULL,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_eval_status CHECK (evaluationStatus IN ('PENDING', 'AUTO_EVALUATED', 'MANUAL_EVALUATED', 'FINALIZED')),
-    CONSTRAINT fk_eval_attempt FOREIGN KEY (attemptId) REFERENCES ExamAttempt(attemptId) ON DELETE CASCADE,
-    CONSTRAINT fk_eval_user FOREIGN KEY (evaluatedBy) REFERENCES User(userId) ON DELETE SET NULL
-) ENGINE=InnoDB;
--- ================================================================
--- 19. EvaluationDetail
--- ================================================================
-CREATE TABLE IF NOT EXISTS EvaluationDetail (
-    evaluationDetailId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    evaluationId BIGINT NOT NULL,
-    questionId BIGINT NOT NULL,
-    marksAwarded DECIMAL(5,2) NOT NULL DEFAULT 0.00,
-    maxMarks DECIMAL(5,2) NOT NULL,
-    isCorrect BOOLEAN NOT NULL DEFAULT FALSE,
-    evaluatorRemarks TEXT NULL,
-    evaluatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT uq_eval_detail_q UNIQUE (evaluationId, questionId),
-    CONSTRAINT chk_eval_detail_marks CHECK (marksAwarded >= 0 AND marksAwarded <= maxMarks),
-    CONSTRAINT fk_ed_eval FOREIGN KEY (evaluationId) REFERENCES Evaluation(evaluationId) ON DELETE CASCADE,
-    CONSTRAINT fk_ed_q FOREIGN KEY (questionId) REFERENCES Question(questionId) ON DELETE RESTRICT
-) ENGINE=InnoDB;
--- ================================================================
--- 20. Result
--- ================================================================
-CREATE TABLE IF NOT EXISTS Result (
-    resultId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    evaluationId BIGINT NOT NULL UNIQUE,
-    percentage DECIMAL(5,2) NOT NULL,
-    grade VARCHAR(5) NULL,
-    passStatus BOOLEAN NOT NULL DEFAULT FALSE,
-    publishedAt DATETIME NULL,
-    publishedBy BIGINT NULL,
-    isPublished BOOLEAN NOT NULL DEFAULT FALSE,
-    remarks TEXT NULL,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_res_percentage CHECK (percentage BETWEEN 0 AND 100),
-    CONSTRAINT fk_res_eval FOREIGN KEY (evaluationId) REFERENCES Evaluation(evaluationId) ON DELETE RESTRICT,
-    CONSTRAINT fk_res_user FOREIGN KEY (publishedBy) REFERENCES User(userId) ON DELETE SET NULL
-) ENGINE=InnoDB;
--- ================================================================
--- DOMAIN E—   NOTIFICATIONS & ADMINISTRATION
--- ================================================================
+CREATE INDEX idx_result_publishedby ON Result(PublishedBy);
+CREATE INDEX idx_result_status ON Result(ResultStatus);
 
--- ================================================================
--- 21.NotificationTemplate
--- ================================================================
-CREATE TABLE IF NOT EXISTS NotificationTemplate (
-    templateId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    templateName VARCHAR(100) NOT NULL UNIQUE,
-    notificationType VARCHAR(30) NOT NULL,
-    subject VARCHAR(150) NULL,
-    templateBody TEXT NOT NULL,
-    isActive BOOLEAN NOT NULL DEFAULT TRUE,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
--- ================================================================
--- 22. Notification
--- ================================================================
-CREATE TABLE IF NOT EXISTS Notification (
-    notificationId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    userId BIGINT NOT NULL,
-    templateId BIGINT NULL,
-    title VARCHAR(150) NOT NULL,
-    message TEXT NOT NULL,
-    notificationType VARCHAR(30) NOT NULL,
-    deliveryChannel VARCHAR(20) NOT NULL DEFAULT 'IN_APP',
-    priority VARCHAR(20) NOT NULL DEFAULT 'NORMAL',
-    isRead BOOLEAN NOT NULL DEFAULT FALSE,
-    sentAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    readAt DATETIME NULL,
-    expiresAt DATETIME NULL,
-    CONSTRAINT chk_notif_type CHECK (notificationType IN ('EXAM', 'RESULT', 'SYSTEM', 'REMINDER', 'SECURITY')),
-    CONSTRAINT chk_notif_channel CHECK (deliveryChannel IN ('IN_APP', 'EMAIL', 'SMS')),
-    CONSTRAINT chk_notif_priority CHECK (priority IN ('LOW', 'NORMAL', 'HIGH', 'CRITICAL')),
-    CONSTRAINT fk_notif_user FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE CASCADE,
-    CONSTRAINT fk_notif_tpl FOREIGN KEY (templateId) REFERENCES NotificationTemplate(templateId) ON DELETE SET NULL
-) ENGINE=InnoDB;
--- ================================================================
--- 23. AuditLog
--- ================================================================
-CREATE TABLE IF NOT EXISTS AuditLog (
-    auditLogId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    userId BIGINT NULL,
-    entityName VARCHAR(100) NOT NULL,
-    entityId BIGINT NULL,
-    action VARCHAR(30) NOT NULL,
-    oldValue JSON NULL,
-    newValue JSON NULL,
-    ipAddress VARCHAR(45) NULL,
-    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_audit_action CHECK (action IN ('CREATE', 'UPDATE', 'DELETE', 'LOGIN', 'LOGOUT', 'VIEW', 'EXPORT')),
-    CONSTRAINT fk_audit_user FOREIGN KEY (userId) REFERENCES User(userId) ON DELETE SET NULL
-) ENGINE=InnoDB;
--- ================================================================
--- 24.SystemEvent
--- ================================================================
-CREATE TABLE IF NOT EXISTS SystemEvent (
-    eventId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    eventType VARCHAR(50) NOT NULL,
-    severity VARCHAR(20) NOT NULL,
-    sourceModule VARCHAR(50) NOT NULL,
-    description TEXT NOT NULL,
-    occurredAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    resolvedAt DATETIME NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'OPEN',
-    CONSTRAINT chk_event_severity CHECK (severity IN ('INFO', 'WARNING', 'ERROR', 'CRITICAL')),
-    CONSTRAINT chk_event_status CHECK (status IN ('OPEN', 'ACKNOWLEDGED', 'RESOLVED'))
-) ENGINE=InnoDB;
--- ================================================================
--- 25. PerformanceMetric
--- ================================================================
-CREATE TABLE IF NOT EXISTS PerformanceMetric (
-    metricId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    metricName VARCHAR(100) NOT NULL,
-    metricValue DECIMAL(12,4) NOT NULL,
-    metricUnit VARCHAR(20) NOT NULL,
-    sourceModule VARCHAR(50) NOT NULL,
-    recordedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT chk_metric_val CHECK (metricValue >= 0)
-) ENGINE=InnoDB;
--- ================================================================
--- 26.  SystemConfiguration
--- ================================================================
-CREATE TABLE IF NOT EXISTS SystemConfiguration (
-    configurationId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    configurationKey VARCHAR(100) NOT NULL UNIQUE,
-    configurationValue TEXT NOT NULL,
-    valueType VARCHAR(20) NOT NULL,
-    description TEXT NULL,
-    isEditable BOOLEAN NOT NULL DEFAULT TRUE,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    updatedBy BIGINT NULL,
-    CONSTRAINT chk_config_type CHECK (valueType IN ('STRING', 'INTEGER', 'BOOLEAN', 'DECIMAL', 'JSON')),
-    CONSTRAINT fk_config_user FOREIGN KEY (updatedBy) REFERENCES User(userId) ON DELETE SET NULL
-) ENGINE=InnoDB;
--- ================================================================
--- 27.FeatureFlag
--- ================================================================
-CREATE TABLE IF NOT EXISTS FeatureFlag (
-    featureFlagId BIGINT AUTO_INCREMENT PRIMARY KEY,
-    flagName VARCHAR(100) NOT NULL UNIQUE,
-    description TEXT NULL,
-    isEnabled BOOLEAN NOT NULL DEFAULT FALSE,
-    rolloutPercentage SMALLINT NOT NULL DEFAULT 100,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT chk_flag_rollout CHECK (rolloutPercentage BETWEEN 0 AND 100)
+-- 16. Notification
+CREATE TABLE Notification (
+    NotificationID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT NOT NULL,
+    Title VARCHAR(150) NOT NULL,
+    Message TEXT NOT NULL,
+    NotificationType ENUM('EXAM','RESULT','SYSTEM','REMINDER') NOT NULL,
+    IsRead BOOLEAN DEFAULT FALSE,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ReadAt DATETIME NULL,
+    IsActive BOOLEAN DEFAULT TRUE,
+    CONSTRAINT fk_notification_user
+        FOREIGN KEY (UserID) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
--- ================================================================
--- SECTION 2 :  DATA INSERTION
--- ================================================================
+CREATE INDEX idx_notification_user ON Notification(UserID);
+CREATE INDEX idx_notification_read ON Notification(IsRead);
 
--- ================================================================
--- 1. IDENTITY & ACCESS DATA
--- ================================================================
-INSERT IGNORE INTO Role (roleId, roleName, description, isActive) VALUES
-(1, 'Admin', 'Full platform administrative control', TRUE),
-(2, 'Faculty', 'Creates questions, designs exams, and evaluates submissions', TRUE),
-(3, 'Student', 'Registers for and takes online examinations', TRUE);
+-- 17. AuditLog
+CREATE TABLE AuditLog (
+    AuditLogID BIGINT AUTO_INCREMENT PRIMARY KEY,
+    UserID BIGINT NULL,
+    ExamAttemptID BIGINT NULL,
+    Module VARCHAR(50) NOT NULL,
+    Action VARCHAR(50) NOT NULL,
+    EntityName VARCHAR(50),
+    RecordID BIGINT NULL,
+    Status VARCHAR(20) NOT NULL,
+    IPAddress VARCHAR(45),
+    Details TEXT,
+    CreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_audit_user
+        FOREIGN KEY (UserID) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+    CONSTRAINT fk_audit_attempt
+        FOREIGN KEY (ExamAttemptID) REFERENCES ExamAttempt(AttemptID)
+        ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
 
-INSERT IGNORE INTO Permission (permissionId, permissionName, moduleName, description) VALUES
-(1, 'CREATE_EXAM', 'ExamModule', 'Allows creating new exam templates'),
-(2, 'PUBLISH_RESULT', 'EvaluationModule', 'Allows publishing finalized results'),
-(3, 'TAKE_EXAM', 'ExecutionModule', 'Allows attempting scheduled exams');
+CREATE INDEX idx_audit_user ON AuditLog(UserID);
+CREATE INDEX idx_audit_attempt ON AuditLog(ExamAttemptID);
+CREATE INDEX idx_audit_module_action ON AuditLog(Module, Action);
+CREATE INDEX idx_audit_created ON AuditLog(CreatedAt);
 
-INSERT IGNORE INTO RolePermission (rolePermissionId, roleId, permissionId) VALUES
-(1, 1, 1), (2, 1, 2), (3, 1, 3),
-(4, 2, 1), (5, 2, 2),
-(6, 3, 3);
+-- Initial RBAC roles
+INSERT INTO Role (RoleID, RoleName, Description) VALUES
+(1, 'ADMIN', 'System administrator'),
+(2, 'FACULTY', 'Faculty/examiner'),
+(3, 'STUDENT', 'Student/candidate');
 
-INSERT IGNORE INTO User (userId, firstName, lastName, email, phone, passwordHash, roleId, isActive) VALUES
-(1, 'System', 'Admin', 'admin@platform.com', '9876543210', '$argon2id$v=19$m=65536,t=3,p=4$hashedadminpass', 1, TRUE),
-(2, 'Dr. Rajesh', 'Sharma', 'rajesh.sharma@college.edu', '9876543211', '$argon2id$v=19$m=65536,t=3,p=4$hashedfacultypass', 2, TRUE),
-(3, 'Rutuja', 'Ghodekar', 'rutuja.student@college.edu', '9876543212', '$argon2id$v=19$m=65536,t=3,p=4$hashedstudentpass', 3, TRUE);
+-- Views
 
-INSERT IGNORE INTO UserSession (sessionId, userId, ipAddress, userAgent, deviceType, sessionStatus, expiresAt) VALUES
-('550e8400-e29b-41d4-a716-446655440000', 3, '192.168.1.15', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'Desktop', 'ACTIVE', DATE_ADD(NOW(), INTERVAL 2 HOUR));
+CREATE OR REPLACE VIEW vw_question_paper AS
+SELECT
+    e.ExamID,
+    e.ExamCode,
+    e.ExamTitle,
+    eq.ExamQuestionID,
+    eq.QuestionOrder,
+    q.QuestionID,
+    q.QuestionType,
+    q.QuestionText,
+    eq.Marks,
+    eq.NegativeMarks,
+    qo.OptionID,
+    qo.OptionText,
+    qo.OptionOrder
+FROM Exam e
+JOIN ExamQuestion eq ON e.ExamID = eq.ExamID
+JOIN Question q ON eq.QuestionID = q.QuestionID
+LEFT JOIN QuestionOption qo ON q.QuestionID = qo.QuestionID
+WHERE e.IsActive = TRUE
+  AND q.IsActive = TRUE;
 
-INSERT IGNORE INTO LoginHistory (loginHistoryId, userId, ipAddress, userAgent, loginStatus, authenticationMethod) VALUES
-(1, 3, '192.168.1.15', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)', 'SUCCESS', 'PASSWORD');
--- ================================================================
--- 2. ACADEMIC & EXAMINATION DATA
--- ================================================================
+CREATE OR REPLACE VIEW vw_student_results AS
+SELECT
+    s.StudentID,
+    u.UserID,
+    CONCAT(u.FirstName, ' ', u.LastName) AS StudentName,
+    s.RollNumber,
+    s.EnrollmentNumber,
+    e.ExamID,
+    e.ExamCode,
+    e.ExamTitle,
+    sub.SubjectID,
+    sub.SubjectCode,
+    sub.SubjectName,
+    ea.AttemptID,
+    ea.AttemptNumber,
+    r.ResultID,
+    r.TotalMarksObtained,
+    r.Percentage,
+    r.TotalCorrect,
+    r.TotalWrong,
+    r.TotalSkipped,
+    r.Grade,
+    r.PassStatus,
+    r.ResultStatus,
+    r.PublishedAt
+FROM Student s
+JOIN User u ON s.UserID = u.UserID
+JOIN CandidateRegistration cr ON s.StudentID = cr.StudentID
+JOIN Exam e ON cr.ExamID = e.ExamID
+JOIN Subject sub ON e.SubjectID = sub.SubjectID
+JOIN ExamAttempt ea ON cr.RegistrationID = ea.RegistrationID
+JOIN Result r ON ea.AttemptID = r.AttemptID;
 
-INSERT IGNORE INTO Subject (subjectId, subjectCode, subjectName, description, credits, createdBy) VALUES
-(1, 'CS101', 'Database Management Systems', 'Core relational database principles and SQL', 4, 1),
-(2, 'CS102', 'Full Stack Web Development', 'MERN stack and modern web application development', 4, 1);
+CREATE OR REPLACE VIEW vw_exam_statistics AS
+SELECT
+    e.ExamID,
+    e.ExamCode,
+    e.ExamTitle,
+    COUNT(DISTINCT cr.RegistrationID) AS TotalCandidates,
+    COUNT(DISTINCT ea.AttemptID) AS TotalAttempts,
+    COALESCE(AVG(r.TotalMarksObtained), 0) AS AverageMarks,
+    COALESCE(MAX(r.TotalMarksObtained), 0) AS HighestMarks,
+    COALESCE(MIN(r.TotalMarksObtained), 0) AS LowestMarks,
+    SUM(CASE WHEN r.PassStatus = TRUE THEN 1 ELSE 0 END) AS PassCount,
+    SUM(CASE WHEN r.PassStatus = FALSE THEN 1 ELSE 0 END) AS FailCount,
+    CASE
+        WHEN COUNT(r.ResultID) = 0 THEN 0
+        ELSE ROUND(
+            SUM(CASE WHEN r.PassStatus = TRUE THEN 1 ELSE 0 END) * 100.0
+            / COUNT(r.ResultID), 2
+        )
+    END AS PassPercentage
+FROM Exam e
+LEFT JOIN CandidateRegistration cr ON e.ExamID = cr.ExamID
+LEFT JOIN ExamAttempt ea ON cr.RegistrationID = ea.RegistrationID
+LEFT JOIN Result r ON ea.AttemptID = r.AttemptID
+GROUP BY e.ExamID, e.ExamCode, e.ExamTitle;
 
-INSERT IGNORE INTO Exam (examId, subjectId, examCode, examTitle, examType, totalMarks, passingMarks, durationMinutes, createdBy) VALUES
-(1, 1, 'EXAM-DBMS-MID', 'DBMS Mid-Term Assessment', 'OBJECTIVE', 100.00, 40.00, 60, 2);
+CREATE OR REPLACE VIEW vw_student_performance AS
+SELECT
+    s.StudentID,
+    CONCAT(u.FirstName, ' ', u.LastName) AS StudentName,
+    COUNT(DISTINCT ea.AttemptID) AS ExamsAttempted,
+    COALESCE(AVG(r.TotalMarksObtained), 0) AS AverageMarks,
+    COALESCE(MAX(r.TotalMarksObtained), 0) AS HighestMarks,
+    SUM(CASE WHEN r.PassStatus = TRUE THEN 1 ELSE 0 END) AS PassCount,
+    SUM(CASE WHEN r.PassStatus = FALSE THEN 1 ELSE 0 END) AS FailCount
+FROM Student s
+JOIN User u ON s.UserID = u.UserID
+LEFT JOIN CandidateRegistration cr ON s.StudentID = cr.StudentID
+LEFT JOIN ExamAttempt ea ON cr.RegistrationID = ea.RegistrationID
+LEFT JOIN Result r ON ea.AttemptID = r.AttemptID
+GROUP BY s.StudentID, u.FirstName, u.LastName;
 
-INSERT IGNORE INTO ExamSchedule (scheduleId, examId, startTime, endTime, registrationStart, registrationEnd, scheduleStatus) VALUES
-(1, 1, DATE_SUB(NOW(), INTERVAL 1 HOUR), DATE_ADD(NOW(), INTERVAL 1 HOUR), DATE_SUB(NOW(), INTERVAL 7 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), 'ONGOING');
-
-INSERT IGNORE INTO CandidateRegistration (registrationId, examId, userId, registrationStatus, eligibilityVerified) VALUES
-(1, 1, 3, 'REGISTERED', TRUE);
-
--- ================================================================
--- 3. QUESTION BANK DATA
--- ================================================================
-
-INSERT IGNORE INTO QuestionCategory (categoryId, categoryName, description, createdBy) VALUES
-(1, 'SQL Queries', 'Relational query construction and syntax', 2),
-(2, 'Database Concepts', 'Normalization, ACID properties, and indexing', 2);
-
-INSERT IGNORE INTO DifficultyLevel (difficultyLevelId, levelName, difficultyScore, description) VALUES
-(1, 'Easy', 1, 'Basic syntax and conceptual recognition'),
-(2, 'Medium', 5, 'Intermediate query building and problem solving');
-
-INSERT IGNORE INTO Question (questionId, categoryId, difficultyLevelId, questionType, questionText, correctAnswer, defaultMarks, negativeMarks, createdBy) VALUES
-(1, 1, 1, 'MCQ', 'Which SQL clause is used to filter records in a SELECT statement?', NULL, 50.00, 0.00, 2),
-(2, 2, 2, 'MSQ', 'Which of the following are ACID properties in DBMS? (Select all that apply)', NULL, 50.00, 0.00, 2);
-
-INSERT IGNORE INTO QuestionOption (optionId, questionId, optionText, optionOrder, isCorrect) VALUES
-(1, 1, 'WHERE', 1, TRUE),
-(2, 1, 'GROUP BY', 2, FALSE),
-(3, 1, 'ORDER BY', 3, FALSE),
-(4, 1, 'HAVING', 4, FALSE),
-(5, 2, 'Atomicity', 1, TRUE),
-(6, 2, 'Consistency', 2, TRUE),
-(7, 2, 'Availability', 3, FALSE),
-(8, 2, 'Durability', 4, TRUE);
-
-INSERT IGNORE INTO ExamQuestion (examQuestionId, examId, questionId, questionOrder, marks, negativeMarks) VALUES
-(1, 1, 1, 1, 50.00, 0.00),
-(2, 1, 2, 2, 50.00, 0.00);
-
--- ================================================================
--- 4. EXAM EXECUTION DATA
--- ================================================================
-INSERT IGNORE INTO ExamAttempt (attemptId, registrationId, attemptNumber, startTime, status, ipAddress) VALUES
-(1, 1, 1, DATE_SUB(NOW(), INTERVAL 45 MINUTE), 'IN_PROGRESS', '192.168.1.15');
-
-INSERT IGNORE INTO Answer (answerId, attemptId, questionId, selectedOptionId, isAnswered, timeSpentSeconds) VALUES
-(1, 1, 1, 1, TRUE, 120),
-(2, 1, 2, 5, TRUE, 180);
-
-INSERT IGNORE INTO Evaluation (evaluationId, attemptId, totalMarksObtained, totalCorrect, totalWrong, totalSkipped, evaluationStatus, evaluatedBy, evaluatedAt) VALUES
-(1, 1, 100.00, 2, 0, 0, 'AUTO_EVALUATED', 2, NOW());
-
-INSERT IGNORE INTO EvaluationDetail (evaluationDetailId, evaluationId, questionId, marksAwarded, maxMarks, isCorrect) VALUES
-(1, 1, 1, 50.00, 50.00, TRUE),
-(2, 1, 2, 50.00, 50.00, TRUE);
-
-INSERT IGNORE INTO Result (resultId, evaluationId, percentage, grade, passStatus, isPublished, publishedBy, publishedAt) VALUES
-(1, 1, 100.00, 'A+', TRUE, TRUE, 2, NOW());
-
--- ================================================================
--- 5. NOTIFICATION & ADMINISTRATION DATA
--- ================================================================
-
-INSERT IGNORE INTO NotificationTemplate (templateId, templateName, notificationType, subject, templateBody) VALUES
-(1, 'RESULT_PUBLISHED', 'RESULT', 'Exam Result Available', 'Dear {{student_name}}, your result for {{exam_title}} is now available.');
-
-INSERT IGNORE INTO Notification (notificationId, userId, templateId, title, message, notificationType, deliveryChannel, isRead) VALUES
-(1, 3, 1, 'Exam Result Available', 'Dear Student, your result for DBMS Mid-Term Assessment is now available.', 'RESULT', 'IN_APP', FALSE);
-
-INSERT IGNORE INTO AuditLog (auditLogId, userId, entityName, entityId, action, newValue, ipAddress) VALUES
-(1, 2, 'Result', 1, 'CREATE', '{"status": "PUBLISHED", "score": 100.00}', '192.168.1.10');
-
-INSERT IGNORE INTO SystemEvent (eventId, eventType, severity, sourceModule, description, status) VALUES
-(1, 'SCHEDULE_TRIGGER', 'INFO', 'SchedulerModule', 'Automated exam completion worker executed successfully.', 'RESOLVED');
-
-INSERT IGNORE INTO PerformanceMetric (metricId, metricName, metricValue, metricUnit, sourceModule) VALUES
-(1, 'DB_QUERY_LATENCY', 12.4500, 'MS', 'DatabaseEngine');
-
-INSERT IGNORE INTO SystemConfiguration (configurationId, configurationKey, configurationValue, valueType, description, updatedBy) VALUES
-(1, 'MAX_EXAM_CONCURRENCY', '500', 'INTEGER', 'Maximum allowed active student exam attempts simultaneously', 1);
-
-INSERT IGNORE INTO FeatureFlag (featureFlagId, flagName, description, isEnabled, rolloutPercentage) VALUES
-(1, 'AUTO_EVALUATION_MSQ', 'Enables automated grading algorithms for multi-select choice questions', TRUE, 100);
+CREATE OR REPLACE VIEW vw_browser_integrity AS
+SELECT
+    AuditLogID,
+    UserID,
+    ExamAttemptID,
+    Action,
+    Status,
+    IPAddress,
+    Details,
+    CreatedAt
+FROM AuditLog
+WHERE Module = 'EXAM_MONITORING';
 
 

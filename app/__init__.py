@@ -19,8 +19,11 @@ def create_app():
 
     from app.routes.auth_routes import auth_bp
     app.register_blueprint(auth_bp)
-    
+
     from Examination_Administration.routes.exam_routes import exam_bp
     app.register_blueprint(exam_bp)
+
+    from Question_Management.routes.question_routes import question_bp
+    app.register_blueprint(question_bp)
 
     return app

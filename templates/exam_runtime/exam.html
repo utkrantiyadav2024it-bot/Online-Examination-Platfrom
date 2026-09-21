@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Examination - DBMS Mid-Term Assessment (EXAM-DBMS-MID)</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+
+  <!-- ================= TOP HUD NAVBAR ================= -->
+  <header class="exam-header">
+    <div class="d-flex align-items-center gap-3">
+      <div>
+        <h6 class="fw-bold m-0 text-dark">DBMS Mid-Term Assessment</h6>
+        <span class="badge bg-light text-dark border" style="font-size: 0.725rem;">CS101 &bull; EXAM-DBMS-MID</span>
+      </div>
+      <span class="badge bg-secondary d-none d-md-inline-block" id="qCurrentBadge">Question 1 of 5</span>
+    </div>
+    
+    <div class="d-flex align-items-center gap-3">
+      <!-- Autosave Status Indicator Pill -->
+      <div class="autosave-pill" id="autosavePill">
+        <span class="autosave-dot"></span>
+        <span id="autosaveText">Answer Saved</span>
+      </div>
+
+      <!-- Server-Synchronized Countdown Timer -->
+      <div class="timer-box" id="timerBox" title="Server Synchronized Timer">
+        <i class="bi bi-clock-history"></i>
+        <span id="examTimer">59:45</span>
+      </div>
+
+      <!-- Fullscreen Toggle -->
+      <button class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex align-items-center" onclick="toggleFullScreen()" title="Toggle Fullscreen">
+        <i class="bi bi-arrows-fullscreen"></i>
+      </button>
+
+      <!-- Submit Exam Button -->
+      <button class="btn btn-primary-custom btn-sm" onclick="openSubmitModal()">
+        <i class="bi bi-check2-circle me-1"></i> Submit Exam
+      </button>
+    </div>
+  </header>
+
+  <!-- ================= INTEGRITY WARNING BANNER ================= -->
+  <div class="container-fluid px-4 pt-3 d-none" id="integrityAlert">
+    <div class="integrity-banner">
+      <i class="bi bi-shield-exclamation fs-4"></i>
+      <div>
+        <strong>Academic Integrity Warning:</strong> Focus departed from examination window. This event and duration have been cryptographically logged into the proctoring audit trail.
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MAIN EXAM RUNTIME WORKSPACE ================= -->
+  <div class="container-fluid flex-grow-1 p-3 p-md-4">
+    <div class="row g-4">
+      
+      <!-- Left Column: Active Question Workspace -->
+      <div class="col-lg-8">
+        
+        <!-- ================= QUESTION 1 (MCQ) ================= -->
+        <div class="glass-card p-4 question-card" id="qCard-1">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-primary fs-6">Question 1 of 5</span>
+            <span class="text-muted small">2.00 Marks &bull; Single Choice (MCQ)</span>
+          </div>
+
+          <h5 class="fw-bold mb-4 text-dark">Which SQL clause is used to filter records in a SELECT statement?</h5>
+
+          <div class="d-flex flex-column gap-3 mb-4">
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q1_opts" value="A" onchange="handleAnswerChange(1)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">A</span>
+              <span class="fw-medium text-dark">WHERE</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q1_opts" value="B" onchange="handleAnswerChange(1)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">B</span>
+              <span class="fw-medium text-dark">GROUP BY</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q1_opts" value="C" onchange="handleAnswerChange(1)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">C</span>
+              <span class="fw-medium text-dark">ORDER BY</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q1_opts" value="D" onchange="handleAnswerChange(1)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">D</span>
+              <span class="fw-medium text-dark">HAVING</span>
+            </label>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3">
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-warning btn-sm" onclick="toggleReview(1)">
+                <i class="bi bi-bookmark-star me-1"></i> <span id="revBtnText-1">Mark for Review</span>
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="clearAnswer(1)">
+                <i class="bi bi-eraser me-1"></i> Clear Selection
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm disabled">&larr; Previous</button>
+              <button class="btn btn-primary-custom btn-sm" onclick="goToQuestion(2)">Next Question &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= QUESTION 2 (MSQ) ================= -->
+        <div class="glass-card p-4 question-card d-none" id="qCard-2">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-purple text-white fs-6" style="background-color: var(--accent-purple);">Question 2 of 5</span>
+            <span class="text-muted small">4.00 Marks &bull; Multiple Choice (MSQ)</span>
+          </div>
+
+          <h5 class="fw-bold mb-2 text-dark">Which of the following are ACID properties in relational DBMS?</h5>
+          <p class="text-muted small mb-4"><i class="bi bi-check-all text-primary me-1"></i> Multiple Choice &mdash; Select all options that apply.</p>
+
+          <div class="d-flex flex-column gap-3 mb-4">
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="checkbox" name="q2_opts" value="A" onchange="handleAnswerChange(2)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">A</span>
+              <span class="fw-medium text-dark">Atomicity</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="checkbox" name="q2_opts" value="B" onchange="handleAnswerChange(2)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">B</span>
+              <span class="fw-medium text-dark">Consistency</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="checkbox" name="q2_opts" value="C" onchange="handleAnswerChange(2)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">C</span>
+              <span class="fw-medium text-dark">Availability</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="checkbox" name="q2_opts" value="D" onchange="handleAnswerChange(2)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">D</span>
+              <span class="fw-medium text-dark">Durability</span>
+            </label>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3">
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-warning btn-sm" onclick="toggleReview(2)">
+                <i class="bi bi-bookmark-star me-1"></i> <span id="revBtnText-2">Mark for Review</span>
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="clearAnswer(2)">
+                <i class="bi bi-eraser me-1"></i> Clear Selection
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="goToQuestion(1)">&larr; Previous</button>
+              <button class="btn btn-primary-custom btn-sm" onclick="goToQuestion(3)">Next Question &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= QUESTION 3 (MCQ) ================= -->
+        <div class="glass-card p-4 question-card d-none" id="qCard-3">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-primary fs-6">Question 3 of 5</span>
+            <span class="text-muted small">2.00 Marks &bull; Single Choice (MCQ)</span>
+          </div>
+
+          <h5 class="fw-bold mb-4 text-dark">Which normal form strictly eliminates transitive functional dependencies?</h5>
+
+          <div class="d-flex flex-column gap-3 mb-4">
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q3_opts" value="A" onchange="handleAnswerChange(3)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">A</span>
+              <span class="fw-medium text-dark">First Normal Form (1NF)</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q3_opts" value="B" onchange="handleAnswerChange(3)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">B</span>
+              <span class="fw-medium text-dark">Second Normal Form (2NF)</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q3_opts" value="C" onchange="handleAnswerChange(3)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">C</span>
+              <span class="fw-medium text-dark">Third Normal Form (3NF)</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q3_opts" value="D" onchange="handleAnswerChange(3)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">D</span>
+              <span class="fw-medium text-dark">Boyce-Codd Normal Form (BCNF)</span>
+            </label>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3">
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-warning btn-sm" onclick="toggleReview(3)">
+                <i class="bi bi-bookmark-star me-1"></i> <span id="revBtnText-3">Mark for Review</span>
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="clearAnswer(3)">
+                <i class="bi bi-eraser me-1"></i> Clear Selection
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="goToQuestion(2)">&larr; Previous</button>
+              <button class="btn btn-primary-custom btn-sm" onclick="goToQuestion(4)">Next Question &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= QUESTION 4 (MCQ) ================= -->
+        <div class="glass-card p-4 question-card d-none" id="qCard-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-primary fs-6">Question 4 of 5</span>
+            <span class="text-muted small">2.00 Marks &bull; Single Choice (MCQ)</span>
+          </div>
+
+          <h5 class="fw-bold mb-4 text-dark">Which SQL constraint uniquely identifies each record in a database table and enforces NOT NULL automatically?</h5>
+
+          <div class="d-flex flex-column gap-3 mb-4">
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q4_opts" value="A" onchange="handleAnswerChange(4)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">A</span>
+              <span class="fw-medium text-dark">FOREIGN KEY</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q4_opts" value="B" onchange="handleAnswerChange(4)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">B</span>
+              <span class="fw-medium text-dark">PRIMARY KEY</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q4_opts" value="C" onchange="handleAnswerChange(4)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">C</span>
+              <span class="fw-medium text-dark">UNIQUE</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q4_opts" value="D" onchange="handleAnswerChange(4)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">D</span>
+              <span class="fw-medium text-dark">CHECK</span>
+            </label>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3">
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-warning btn-sm" onclick="toggleReview(4)">
+                <i class="bi bi-bookmark-star me-1"></i> <span id="revBtnText-4">Mark for Review</span>
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="clearAnswer(4)">
+                <i class="bi bi-eraser me-1"></i> Clear Selection
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="goToQuestion(3)">&larr; Previous</button>
+              <button class="btn btn-primary-custom btn-sm" onclick="goToQuestion(5)">Next Question &rarr;</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= QUESTION 5 (MCQ) ================= -->
+        <div class="glass-card p-4 question-card d-none" id="qCard-5">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="badge bg-primary fs-6">Question 5 of 5</span>
+            <span class="text-muted small">2.00 Marks &bull; Single Choice (MCQ)</span>
+          </div>
+
+          <h5 class="fw-bold mb-4 text-dark">Which isolation level prevents Dirty Reads, Non-Repeatable Reads, and Phantom Reads?</h5>
+
+          <div class="d-flex flex-column gap-3 mb-4">
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q5_opts" value="A" onchange="handleAnswerChange(5)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">A</span>
+              <span class="fw-medium text-dark">Read Committed</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q5_opts" value="B" onchange="handleAnswerChange(5)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">B</span>
+              <span class="fw-medium text-dark">Repeatable Read</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q5_opts" value="C" onchange="handleAnswerChange(5)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">C</span>
+              <span class="fw-medium text-dark">Serializable</span>
+            </label>
+            <label class="p-3 rounded border section-bg d-flex align-items-center gap-3 cursor-pointer option-item">
+              <input type="radio" name="q5_opts" value="D" onchange="handleAnswerChange(5)">
+              <span class="badge-option-letter font-monospace px-2 py-1 rounded">D</span>
+              <span class="fw-medium text-dark">Read Uncommitted</span>
+            </label>
+          </div>
+
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 border-top pt-3">
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-warning btn-sm" onclick="toggleReview(5)">
+                <i class="bi bi-bookmark-star me-1"></i> <span id="revBtnText-5">Mark for Review</span>
+              </button>
+              <button class="btn btn-outline-secondary btn-sm" onclick="clearAnswer(5)">
+                <i class="bi bi-eraser me-1"></i> Clear Selection
+              </button>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-outline-secondary btn-sm" onclick="goToQuestion(4)">&larr; Previous</button>
+              <button class="btn btn-success btn-sm fw-bold" onclick="openSubmitModal()">
+                <i class="bi bi-check2-circle me-1"></i> Submit Examination
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column: Question Palette & Live Statistics -->
+      <div class="col-lg-4">
+        <div class="glass-card p-4 sticky-top" style="top: 85px;">
+          <h6 class="fw-bold text-dark mb-3"><i class="bi bi-grid-3x3-gap-fill text-primary me-2"></i>Question Palette</h6>
+          
+          <!-- Palette Button Grid -->
+          <div class="d-flex flex-wrap gap-2 mb-4" id="paletteGrid">
+            <button type="button" class="question-palette-btn current" id="palette-1" onclick="goToQuestion(1)">1</button>
+            <button type="button" class="question-palette-btn" id="palette-2" onclick="goToQuestion(2)">2</button>
+            <button type="button" class="question-palette-btn" id="palette-3" onclick="goToQuestion(3)">3</button>
+            <button type="button" class="question-palette-btn" id="palette-4" onclick="goToQuestion(4)">4</button>
+            <button type="button" class="question-palette-btn" id="palette-5" onclick="goToQuestion(5)">5</button>
+          </div>
+
+          <!-- Palette Legend -->
+          <div class="p-3 rounded border section-bg small mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="d-flex align-items-center gap-2"><span class="badge bg-emerald" style="width: 14px; height: 14px; padding: 0; background-color: var(--emerald);"></span> Answered:</span>
+              <strong class="text-emerald" id="statAnswered">0</strong>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="d-flex align-items-center gap-2"><span class="badge bg-amber" style="width: 14px; height: 14px; padding: 0; background-color: var(--amber);"></span> Marked for Review:</span>
+              <strong class="text-warning" id="statReview">0</strong>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="d-flex align-items-center gap-2"><span class="badge" style="width: 14px; height: 14px; padding: 0; background-color: var(--mmcoe-maroon);"></span> Current Question:</span>
+              <span class="fw-semibold text-dark" id="statCurrent">Q1</span>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="d-flex align-items-center gap-2"><span class="badge bg-light border" style="width: 14px; height: 14px; padding: 0;"></span> Not Answered:</span>
+              <strong class="text-muted" id="statNotAnswered">5</strong>
+            </div>
+          </div>
+
+          <button class="btn btn-primary-custom w-100 py-2 justify-content-center" onclick="openSubmitModal()">
+            <i class="bi bi-send-check me-2"></i> Submit & Finish Examination
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= SUBMIT CONFIRMATION MODAL ================= -->
+  <div class="modal fade" id="submitModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card">
+        <div class="modal-header border-bottom">
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Confirm Final Submission</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <p class="text-muted small mb-3">Please review your question answer summary before submitting. Once confirmed, your responses cannot be modified.</p>
+          
+          <div class="table-responsive mb-3">
+            <table class="table table-sm table-bordered small text-center mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Total Questions</th>
+                  <th>Answered</th>
+                  <th>Marked for Review</th>
+                  <th>Unanswered</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="fw-bold">5</td>
+                  <td class="text-success fw-bold" id="modalAnswered">0</td>
+                  <td class="text-warning fw-bold" id="modalReview">0</td>
+                  <td class="text-danger fw-bold" id="modalUnanswered">5</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div id="modalWarningUnanswered" class="alert alert-warning small d-flex align-items-center gap-2 mb-0">
+            <i class="bi bi-exclamation-circle-fill fs-5"></i>
+            <div>You have unanswered questions. Are you sure you want to proceed?</div>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Return to Exam</button>
+          <button type="button" class="btn btn-danger btn-sm" onclick="executeFinalSubmission()">
+            <i class="bi bi-check2-all me-1"></i> Yes, Confirm & Submit
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+  <script>
+    // State Tracker
+    const qState = {
+      total: 5,
+      current: 1,
+      answered: {},
+      review: {}
+    };
+
+    // Countdown Timer Logic
+    let remainingSeconds = 59 * 60 + 45;
+    const timerEl = document.getElementById('examTimer');
+    const timerBox = document.getElementById('timerBox');
+
+    const countdownInterval = setInterval(() => {
+      remainingSeconds--;
+      if (remainingSeconds <= 0) {
+        clearInterval(countdownInterval);
+        executeFinalSubmission(true);
+        return;
+      }
+      const mins = Math.floor(remainingSeconds / 60);
+      const secs = remainingSeconds % 60;
+      timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      // Warning when under 5 minutes
+      if (remainingSeconds < 300 && remainingSeconds > 60) {
+        timerBox.className = 'timer-box pulse-warning';
+      } else if (remainingSeconds <= 60) {
+        timerBox.className = 'timer-box pulse-critical';
+      }
+    }, 1000);
+
+    // Navigation
+    function goToQuestion(qNum) {
+      document.getElementById(`qCard-${qState.current}`).classList.add('d-none');
+      document.getElementById(`qCard-${qNum}`).classList.remove('d-none');
+      qState.current = qNum;
+
+      document.getElementById('qCurrentBadge').textContent = `Question ${qNum} of ${qState.total}`;
+      document.getElementById('statCurrent').textContent = `Q${qNum}`;
+
+      updatePaletteUI();
+    }
+
+    // Answer selection handler
+    function handleAnswerChange(qNum) {
+      qState.answered[qNum] = true;
+      triggerAutosave('saving');
+      updatePaletteUI();
+    }
+
+    // Mark for review toggle
+    function toggleReview(qNum) {
+      qState.review[qNum] = !qState.review[qNum];
+      const btnText = document.getElementById(`revBtnText-${qNum}`);
+      if (btnText) {
+        btnText.textContent = qState.review[qNum] ? 'Unmark Review' : 'Mark for Review';
+      }
+      updatePaletteUI();
+    }
+
+    // Clear selection
+    function clearAnswer(qNum) {
+      delete qState.answered[qNum];
+      const card = document.getElementById(`qCard-${qNum}`);
+      card.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.checked = false);
+      triggerAutosave('saving');
+      updatePaletteUI();
+    }
+
+    // Update Palette Buttons and Legend Counters
+    function updatePaletteUI() {
+      let answeredCount = 0;
+      let reviewCount = 0;
+
+      for (let i = 1; i <= qState.total; i++) {
+        const btn = document.getElementById(`palette-${i}`);
+        btn.className = 'question-palette-btn';
+
+        if (qState.current === i) {
+          btn.classList.add('current');
+        } else if (qState.review[i]) {
+          btn.classList.add('review');
+          reviewCount++;
+        } else if (qState.answered[i]) {
+          btn.classList.add('answered');
+          answeredCount++;
+        }
+      }
+
+      // Count reviews even if current
+      for (let i = 1; i <= qState.total; i++) {
+        if (qState.review[i] && qState.current === i) reviewCount++;
+        if (qState.answered[i] && qState.current === i) answeredCount++;
+      }
+
+      const notAnsweredCount = qState.total - Object.keys(qState.answered).length;
+
+      document.getElementById('statAnswered').textContent = Object.keys(qState.answered).length;
+      document.getElementById('statReview').textContent = Object.keys(qState.review).filter(k => qState.review[k]).length;
+      document.getElementById('statNotAnswered').textContent = notAnsweredCount;
+    }
+
+    // Submit Modal
+    function openSubmitModal() {
+      const answered = Object.keys(qState.answered).length;
+      const review = Object.keys(qState.review).filter(k => qState.review[k]).length;
+      const unanswered = qState.total - answered;
+
+      document.getElementById('modalAnswered').textContent = answered;
+      document.getElementById('modalReview').textContent = review;
+      document.getElementById('modalUnanswered').textContent = unanswered;
+      document.getElementById('modalWarningUnanswered').classList.toggle('d-none', unanswered === 0);
+
+      new bootstrap.Modal(document.getElementById('submitModal')).show();
+    }
+
+    function executeFinalSubmission(auto = false) {
+      clearInterval(countdownInterval);
+      if (auto) {
+        alert('Examination time has expired! Your responses have been automatically submitted.');
+      }
+      window.location.href = '/exam_runtime/submitted.html';
+    }
+
+    // Anti-cheat Proctoring Event Hooks
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        document.getElementById('integrityAlert').classList.remove('d-none');
+        triggerAutosave('saving');
+      }
+    });
+
+    window.addEventListener('blur', () => {
+      document.getElementById('integrityAlert').classList.remove('d-none');
+    });
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  </script>
+</body>
+</html>

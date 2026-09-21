@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administrator Control Center - MMCOE ExamPlatform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="sidebar-brand">
+      <i class="bi bi-mortarboard-fill"></i>
+      <span>MMCOE Exam</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-title">Administrator Portal</div>
+    <div class="nav-item">
+      <a href="/admin/dashboard.html" class="nav-link active">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/users/list.html" class="nav-link ">
+        <i class="bi bi-people-fill"></i>
+        <span>User Management</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/roles/permissions.html" class="nav-link ">
+        <i class="bi bi-shield-lock-fill"></i>
+        <span>RBAC Matrix</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/system/metrics.html" class="nav-link ">
+        <i class="bi bi-cpu-fill"></i>
+        <span>System Health & Flags</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/audit/list.html" class="nav-link ">
+        <i class="bi bi-journal-text"></i>
+        <span>Audit Logs</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/reports/exam_report.html" class="nav-link ">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Reports</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+    <div class="main-content">
+      <header class="top-navbar">
+  <div class="navbar-search">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Search exams, questions, subjects..." id="globalSearchInput">
+  </div>
+  <div class="navbar-actions">
+    <!-- Notification Bell Dropdown Button -->
+    <div class="dropdown me-2">
+      <button class="icon-btn" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow border bg-white p-0 mt-2" style="width: 340px;" aria-labelledby="notifDropdown">
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+          <h6 class="m-0 fw-bold text-dark">Notifications</h6>
+          <span class="badge bg-primary rounded-pill">3 New</span>
+        </div>
+        <div class="list-group list-group-flush small" style="max-height: 280px; overflow-y: auto;">
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-info"><i class="bi bi-award me-1"></i> Result Published</strong>
+              <small class="text-muted">10m ago</small>
+            </div>
+            <p class="mb-1 text-muted">Your result for DBMS Mid-Term Assessment is now available.</p>
+          </a>
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-warning"><i class="bi bi-clock me-1"></i> Exam Reminder</strong>
+              <small class="text-muted">1h ago</small>
+            </div>
+            <p class="mb-1 text-muted">Full Stack Web Development exam starts in 2 hours.</p>
+          </a>
+        </div>
+        <div class="p-2 text-center border-top">
+          <a href="/notifications/center.html" class="text-decoration-none small text-info fw-semibold">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <div class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="avatar" style="background: var(--mmcoe-maroon);">A</div>
+        <div class="user-info">
+          <span class="user-name">System Administrator</span>
+          <span class="user-role">Super Admin (ID: 1)</span>
+        </div>
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.75rem;"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow border mt-2">
+        <li><a class="dropdown-item" href="/admin/profile.html"><i class="bi bi-person-gear me-2"></i>Admin Profile</a></li>
+        <li><a class="dropdown-item" href="/admin/users/list.html"><i class="bi bi-people me-2"></i>User Management</a></li>
+          <li><a class="dropdown-item" href="/admin/system/metrics.html"><i class="bi bi-gear me-2"></i>Settings & Diagnostics</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/auth/login.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+      <main class="content-body">
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Administrator Control Center</li>
+  </ol>
+</nav>
+
+<!-- Welcome & Status Header -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+  <div>
+    <div class="d-flex align-items-center gap-2 mb-1">
+      <h3 class="fw-bold m-0 text-dark">System Governance & Health</h3>
+      <span class="status-badge badge-active"><i class="bi bi-circle-fill" style="font-size: 8px;"></i> Platform Operational</span>
+    </div>
+    <p class="text-muted small m-0">Identity management, academic master data, RBAC policies, and real-time system oversight</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/admin/users/list.html" class="btn btn-outline-info btn-sm">
+      <i class="bi bi-person-gear"></i> Manage Users
+    </a>
+    <a href="/admin/audit/list.html" class="btn btn-outline-secondary btn-sm">
+      <i class="bi bi-journal-text"></i> Audit Logs
+    </a>
+    <a href="/admin/system/metrics.html" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-cpu"></i> System Health
+    </a>
+  </div>
+</div>
+
+<!-- Summary Metric Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <a href="/admin/users/list.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon maroon"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-info">
+          <h3>1,248</h3>
+          <p>Total Registered Users</p>
+          <span class="badge bg-light text-success border mt-1" style="font-size: 0.7rem;">+12 this week</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <a href="/admin/users/list.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon navy"><i class="bi bi-person-check-fill"></i></div>
+        <div class="stat-info">
+          <h3>1,192</h3>
+          <p>Active Verified Accounts</p>
+          <span class="text-muted small" style="font-size: 0.7rem;">95.5% active rate</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <a href="#activeExamsSection" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon emerald"><i class="bi bi-journal-check"></i></div>
+        <div class="stat-info">
+          <h3>4</h3>
+          <p>Examinations in Progress</p>
+          <span class="badge bg-light text-emerald border mt-1" style="font-size: 0.7rem;">Live Runtime</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <a href="/admin/system/metrics.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon amber"><i class="bi bi-exclamation-octagon-fill"></i></div>
+        <div class="stat-info">
+          <h3>3</h3>
+          <p>System Attention Flags</p>
+          <span class="badge bg-light text-warning border mt-1" style="font-size: 0.7rem;">Requires Review</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Left Column: User Distribution & System Status -->
+  <div class="col-lg-6">
+    <!-- User Population Breakdown -->
+    <div class="glass-card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-pie-chart-fill text-primary me-2"></i>User Population Distribution</h5>
+        <a href="/admin/users/list.html" class="text-info small text-decoration-none">View Directory &rarr;</a>
+      </div>
+      
+      <div class="d-flex flex-column gap-3">
+        <div>
+          <div class="d-flex justify-content-between small fw-semibold mb-1">
+            <span><i class="bi bi-mortarboard me-1 text-success"></i> Students</span>
+            <span>1,100 (88.1%)</span>
+          </div>
+          <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-success" role="progressbar" style="width: 88.1%;" aria-valuenow="88.1" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between small fw-semibold mb-1">
+            <span><i class="bi bi-person-badge me-1 text-info"></i> Faculty Members</span>
+            <span>120 (9.6%)</span>
+          </div>
+          <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-info" role="progressbar" style="width: 9.6%;" aria-valuenow="9.6" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between small fw-semibold mb-1">
+            <span><i class="bi bi-shield-lock me-1 text-danger"></i> System Administrators</span>
+            <span>28 (2.3%)</span>
+          </div>
+          <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-danger" role="progressbar" style="width: 2.3%;" aria-valuenow="2.3" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Core Services Health Status -->
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-hdd-network text-emerald me-2"></i>Core Platform Health Status</h5>
+        <a href="/admin/system/metrics.html" class="text-info small text-decoration-none">Diagnostics &rarr;</a>
+      </div>
+      <div class="row g-2">
+        <div class="col-sm-6">
+          <div class="p-2 rounded border section-bg d-flex align-items-center justify-content-between">
+            <span class="small fw-semibold">REST API Gateway</span>
+            <span class="status-badge badge-active"><i class="bi bi-check-circle-fill"></i> Normal</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="p-2 rounded border section-bg d-flex align-items-center justify-content-between">
+            <span class="small fw-semibold">MySQL 8 Database</span>
+            <span class="status-badge badge-active"><i class="bi bi-check-circle-fill"></i> 12.4ms</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="p-2 rounded border section-bg d-flex align-items-center justify-content-between">
+            <span class="small fw-semibold">Argon2id Auth Service</span>
+            <span class="status-badge badge-active"><i class="bi bi-check-circle-fill"></i> Active</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="p-2 rounded border section-bg d-flex align-items-center justify-content-between">
+            <span class="small fw-semibold">Examination Engine</span>
+            <span class="status-badge badge-active"><i class="bi bi-check-circle-fill"></i> Operational</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="p-2 rounded border section-bg d-flex align-items-center justify-content-between">
+            <span class="small fw-semibold">Evaluation Engine</span>
+            <span class="status-badge badge-active"><i class="bi bi-check-circle-fill"></i> Operational</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div class="p-2 rounded border section-bg d-flex align-items-center justify-content-between">
+            <span class="small fw-semibold">APScheduler Service</span>
+            <span class="status-badge badge-active"><i class="bi bi-check-circle-fill"></i> Syncing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Column: Attention Required & Admin Activity -->
+  <div class="col-lg-6">
+    <!-- Attention Required Widget -->
+    <div class="attention-widget mb-4">
+      <div class="attention-header">
+        <span class="d-flex align-items-center gap-2">
+          <i class="bi bi-shield-exclamation text-danger fs-5"></i>
+          <span>Attention Required (System Alerts)</span>
+        </span>
+        <span class="badge bg-danger rounded-pill">3 Active</span>
+      </div>
+      <div class="attention-item">
+        <div>
+          <div class="fw-semibold text-danger"><i class="bi bi-shield-lock-fill me-1"></i> 2 Accounts Temporarily Locked</div>
+          <div class="text-muted small">Automatic lock triggered after 5 consecutive failed login attempts.</div>
+        </div>
+        <a href="/admin/users/list.html" class="btn btn-sm btn-outline-danger">Review</a>
+      </div>
+      <div class="attention-item">
+        <div>
+          <div class="fw-semibold text-warning"><i class="bi bi-flag-fill me-1"></i> 4 Unresolved Integrity Flags</div>
+          <div class="text-muted small">Tab-switch & fullscreen departure events recorded during DBMS exam.</div>
+        </div>
+        <a href="/admin/audit/list.html" class="btn btn-sm btn-outline-warning">Audit</a>
+      </div>
+      <div class="attention-item">
+        <div>
+          <div class="fw-semibold text-info"><i class="bi bi-toggle2-on me-1"></i> Feature Flag Modified</div>
+          <div class="text-muted small">AUTO_EVALUATION_MSQ enabled for 100% rollout by Super Admin.</div>
+        </div>
+        <a href="/admin/system/metrics.html" class="btn btn-sm btn-outline-secondary">Config</a>
+      </div>
+    </div>
+
+    <!-- Recent Administrative Activity -->
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-clock-history text-secondary me-2"></i>Recent Administrative Activity</h5>
+        <a href="/admin/audit/list.html" class="text-info small text-decoration-none">Full Audit Log &rarr;</a>
+      </div>
+      <div class="list-group list-group-flush small">
+        <div class="list-group-item px-0 py-2 border-0 d-flex justify-content-between align-items-center">
+          <div>
+            <span class="fw-semibold text-dark">Faculty Account Created</span>
+            <div class="text-muted">Assigned Dr. Rajesh Sharma to Department of Computer Engineering</div>
+          </div>
+          <span class="text-muted font-monospace" style="font-size: 0.75rem;">09:42 AM</span>
+        </div>
+        <div class="list-group-item px-0 py-2 border-0 border-top d-flex justify-content-between align-items-center">
+          <div>
+            <span class="fw-semibold text-dark">Subject CS102 Updated</span>
+            <div class="text-muted">Updated credit configuration and syllabus reference for Full Stack Web Dev</div>
+          </div>
+          <span class="text-muted font-monospace" style="font-size: 0.75rem;">09:31 AM</span>
+        </div>
+        <div class="list-group-item px-0 py-2 border-0 border-top d-flex justify-content-between align-items-center">
+          <div>
+            <span class="fw-semibold text-dark">RBAC Matrix Updated</span>
+            <div class="text-muted">Verified granular examination publishing permissions for Faculty role</div>
+          </div>
+          <span class="text-muted font-monospace" style="font-size: 0.75rem;">09:15 AM</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Active Examinations Overview -->
+<div class="glass-card p-4 mb-4" id="activeExamsSection">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h5 class="fw-bold m-0 text-dark"><i class="bi bi-play-circle-fill text-emerald me-2"></i>Active Examinations Overview</h5>
+      <p class="text-muted small m-0">Live monitoring of running sessions across departments (Read-Only Governance Oversight)</p>
+    </div>
+    <span class="status-badge badge-active"><i class="bi bi-broadcast"></i> 4 Sessions Live</span>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-hover align-middle small mb-0">
+      <thead>
+        <tr class="text-muted">
+          <th>Exam Code & Title</th>
+          <th>Subject</th>
+          <th>Lead Faculty</th>
+          <th>Candidates</th>
+          <th>Window / Schedule</th>
+          <th>Integrity Status</th>
+          <th>State</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="fw-bold text-dark">EXAM-DBMS-MID</div>
+            <div class="text-muted">DBMS Mid-Term Assessment</div>
+          </td>
+          <td><span class="badge bg-light text-dark border">CS101</span></td>
+          <td class="fw-semibold">Dr. Rajesh Sharma</td>
+          <td><span class="fw-bold text-emerald">42</span> Registered</td>
+          <td>Today, 02:00 PM – 03:00 PM</td>
+          <td><span class="status-badge badge-pending">2 Flags Logged</span></td>
+          <td><span class="badge bg-success">LIVE</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div class="fw-bold text-dark">EXAM-FSWD-INTERNAL</div>
+            <div class="text-muted">Full Stack Web Dev Internal</div>
+          </td>
+          <td><span class="badge bg-light text-dark border">CS102</span></td>
+          <td class="fw-semibold">Prof. A. Patil</td>
+          <td><span class="fw-bold text-emerald">38</span> Registered</td>
+          <td>Today, 04:00 PM – 05:00 PM</td>
+          <td><span class="status-badge badge-active">Clear (0 Flags)</span></td>
+          <td><span class="badge bg-info">SCHEDULED</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>

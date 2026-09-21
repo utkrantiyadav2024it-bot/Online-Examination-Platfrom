@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty Dashboard - MMCOE ExamPlatform</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="sidebar-brand">
+      <i class="bi bi-mortarboard-fill"></i>
+      <span>MMCOE Exam</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-title">Faculty Portal</div>
+    <div class="nav-item">
+      <a href="/faculty/dashboard.html" class="nav-link active">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/questions/list.html" class="nav-link ">
+        <i class="bi bi-question-square-fill"></i>
+        <span>Question Bank</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/exams/list.html" class="nav-link ">
+        <i class="bi bi-card-checklist"></i>
+        <span>Exam Management</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/exams/monitor.html" class="nav-link ">
+        <i class="bi bi-display"></i>
+        <span>Live Monitoring</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/evaluation/pending.html" class="nav-link ">
+        <i class="bi bi-pencil-square"></i>
+        <span>Evaluations</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/subjects/list.html" class="nav-link ">
+        <i class="bi bi-book-fill"></i>
+        <span>My Assigned Subjects</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/reports/exam_report.html" class="nav-link ">
+        <i class="bi bi-bar-chart-line-fill"></i>
+        <span>Exam Analytics</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+    <div class="main-content">
+      <header class="top-navbar">
+  <div class="navbar-search">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Search exams, questions, subjects..." id="globalSearchInput">
+  </div>
+  <div class="navbar-actions">
+    <!-- Notification Bell Dropdown Button -->
+    <div class="dropdown me-2">
+      <button class="icon-btn" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow border bg-white p-0 mt-2" style="width: 340px;" aria-labelledby="notifDropdown">
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+          <h6 class="m-0 fw-bold text-dark">Notifications</h6>
+          <span class="badge bg-primary rounded-pill">3 New</span>
+        </div>
+        <div class="list-group list-group-flush small" style="max-height: 280px; overflow-y: auto;">
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-info"><i class="bi bi-award me-1"></i> Result Published</strong>
+              <small class="text-muted">10m ago</small>
+            </div>
+            <p class="mb-1 text-muted">Your result for DBMS Mid-Term Assessment is now available.</p>
+          </a>
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-warning"><i class="bi bi-clock me-1"></i> Exam Reminder</strong>
+              <small class="text-muted">1h ago</small>
+            </div>
+            <p class="mb-1 text-muted">Full Stack Web Development exam starts in 2 hours.</p>
+          </a>
+        </div>
+        <div class="p-2 text-center border-top">
+          <a href="/notifications/center.html" class="text-decoration-none small text-info fw-semibold">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <div class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="avatar" style="background: var(--mmcoe-navy);">F</div>
+        <div class="user-info">
+          <span class="user-name">Dr. Rajesh Sharma</span>
+          <span class="user-role">Faculty (Comp Eng)</span>
+        </div>
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.75rem;"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow border mt-2">
+        <li><a class="dropdown-item" href="/faculty/profile.html"><i class="bi bi-person-badge me-2"></i>Faculty Profile</a></li>
+          <li><a class="dropdown-item" href="/reports/exam_report.html"><i class="bi bi-bar-chart-line me-2"></i>Performance Reports</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/auth/login.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+      <main class="content-body">
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="/"><i class="bi bi-house-door me-1"></i>Home</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Faculty Operations Center</li>
+  </ol>
+</nav>
+
+<!-- Welcome & Quick Actions -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold m-0 text-dark">Welcome, Dr. Rajesh Sharma</h3>
+    <p class="text-muted small m-0">Department of Computer Engineering &bull; Marathwada Mitra Mandal's College of Engineering</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="/questions/create.html" class="btn btn-outline-info btn-sm">
+      <i class="bi bi-plus-circle"></i> Add Question
+    </a>
+    <a href="/exams/create.html" class="btn btn-primary-custom btn-sm">
+      <i class="bi bi-plus-lg"></i> Build Examination
+    </a>
+  </div>
+</div>
+
+<!-- Actionable KPI Stat Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <a href="/exams/list.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon maroon"><i class="bi bi-card-checklist"></i></div>
+        <div class="stat-info">
+          <h3>2</h3>
+          <p>Active & Upcoming Exams</p>
+          <span class="badge bg-light text-primary border mt-1" style="font-size: 0.7rem;">1 Live, 1 Scheduled</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <a href="/questions/list.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon blue"><i class="bi bi-question-square-fill"></i></div>
+        <div class="stat-info">
+          <h3>24</h3>
+          <p>Questions in Repository</p>
+          <span class="badge bg-light text-info border mt-1" style="font-size: 0.7rem;">MCQ & MSQ Pools</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <a href="/evaluation/pending.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon amber"><i class="bi bi-hourglass-split"></i></div>
+        <div class="stat-info">
+          <h3>2</h3>
+          <p>Pending Evaluations</p>
+          <span class="badge bg-light text-danger border mt-1" style="font-size: 0.7rem;">Action Required</span>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <a href="/exams/monitor.html" class="text-decoration-none">
+      <div class="glass-card stat-card h-100">
+        <div class="stat-icon emerald"><i class="bi bi-people-fill"></i></div>
+        <div class="stat-info">
+          <h3>42</h3>
+          <p>Registered Candidates</p>
+          <span class="badge bg-light text-emerald border mt-1" style="font-size: 0.7rem;">CS101 Session</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div class="row g-4 mb-4">
+  <!-- Left: Upcoming & Active Exams -->
+  <div class="col-lg-7">
+    <div class="glass-card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-play-circle text-emerald me-2"></i>My Examinations (Active & Scheduled)</h5>
+        <a href="/exams/list.html" class="text-info small text-decoration-none">Manage All &rarr;</a>
+      </div>
+
+      <!-- Live Exam Card -->
+      <div class="p-3 rounded border mb-3" style="background: rgba(5, 150, 105, 0.04); border-left: 4px solid var(--emerald) !important;">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="badge bg-success mb-1">● LIVE EXAMINATION</span>
+            <h6 class="fw-bold text-dark m-0">DBMS Mid-Term Assessment</h6>
+            <span class="text-muted small">Course: CS101 (Database Management Systems) &bull; 60 Mins</span>
+          </div>
+          <span class="font-monospace fw-bold text-dark badge bg-light border">EXAM-DBMS-MID</span>
+        </div>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-top pt-2 mt-2 small">
+          <div class="text-muted">
+            <i class="bi bi-people me-1"></i> <strong>42</strong> Registered &bull; <i class="bi bi-question-circle me-1"></i> <strong>20</strong> Questions
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/exams/monitor.html" class="btn btn-sm btn-outline-success"><i class="bi bi-display me-1"></i> Live Monitor</a>
+            <a href="/exams/detail.html" class="btn btn-sm btn-outline-secondary">Details</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scheduled Exam Card -->
+      <div class="p-3 rounded border section-bg">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <span class="status-badge badge-scheduled mb-1">SCHEDULED</span>
+            <h6 class="fw-bold text-dark m-0">Full Stack Internal Assessment</h6>
+            <span class="text-muted small">Course: CS102 (Full Stack Web Development) &bull; Tomorrow 10:00 AM</span>
+          </div>
+          <span class="font-monospace fw-bold text-dark badge bg-light border">EXAM-FSWD-INTERNAL</span>
+        </div>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 border-top pt-2 mt-2 small">
+          <div class="text-muted">
+            <i class="bi bi-people me-1"></i> <strong>38</strong> Registered &bull; <i class="bi bi-question-circle me-1"></i> <strong>15</strong> Questions
+          </div>
+          <div class="d-flex gap-2">
+            <a href="/exams/edit.html" class="btn btn-sm btn-outline-info"><i class="bi bi-gear me-1"></i> Manage</a>
+            <a href="/exams/detail.html" class="btn btn-sm btn-outline-secondary">Details</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Candidate Submissions -->
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-inbox-fill text-info me-2"></i>Recent Candidate Submissions</h5>
+        <a href="/evaluation/pending.html" class="text-info small text-decoration-none">Evaluation Queue &rarr;</a>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover align-middle small mb-0">
+          <thead>
+            <tr class="text-muted border-bottom">
+              <th>Candidate</th>
+              <th>Exam Code</th>
+              <th>Submitted</th>
+              <th>Auto-Score</th>
+              <th>Integrity</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="fw-semibold text-dark">Rutuja Ghodekar</div>
+                <div class="text-muted" style="font-size: 0.7rem;">Roll: 41101</div>
+              </td>
+              <td><span class="font-monospace">EXAM-DBMS-MID</span></td>
+              <td class="text-muted">02:30 PM</td>
+              <td><span class="fw-bold text-emerald">90 / 100</span></td>
+              <td><span class="status-badge badge-pending">2 Flags</span></td>
+              <td class="text-end">
+                <a href="/evaluation/evaluate.html" class="btn btn-sm btn-primary-custom py-1 px-2" style="font-size: 0.775rem;">Evaluate</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="fw-semibold text-dark">Shlok Powar</div>
+                <div class="text-muted" style="font-size: 0.7rem;">Roll: 41102</div>
+              </td>
+              <td><span class="font-monospace">EXAM-DBMS-MID</span></td>
+              <td class="text-muted">02:25 PM</td>
+              <td><span class="fw-bold text-emerald">95 / 100</span></td>
+              <td><span class="status-badge badge-active">Clear</span></td>
+              <td class="text-end">
+                <a href="/evaluation/evaluate.html" class="btn btn-sm btn-primary-custom py-1 px-2" style="font-size: 0.775rem;">Evaluate</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: Attention Required & Quick Subjects -->
+  <div class="col-lg-5">
+    <!-- Attention Required Widget -->
+    <div class="attention-widget mb-4">
+      <div class="attention-header">
+        <span class="d-flex align-items-center gap-2">
+          <i class="bi bi-exclamation-diamond-fill text-danger fs-5"></i>
+          <span>Attention Required (Faculty Tasks)</span>
+        </span>
+        <span class="badge bg-danger rounded-pill">3 Tasks</span>
+      </div>
+      <div class="attention-item">
+        <div>
+          <div class="fw-semibold text-danger"><i class="bi bi-pencil-square me-1"></i> 2 Evaluations Awaiting Review</div>
+          <div class="text-muted small">DBMS Mid-Term objective scores ready for final sign-off.</div>
+        </div>
+        <a href="/evaluation/pending.html" class="btn btn-sm btn-outline-danger">Review</a>
+      </div>
+      <div class="attention-item">
+        <div>
+          <div class="fw-semibold text-warning"><i class="bi bi-shield-exclamation me-1"></i> 1 Candidate Integrity Review</div>
+          <div class="text-muted small">Rutuja Ghodekar: Tab switch detected at 02:17 PM.</div>
+        </div>
+        <a href="/evaluation/evaluate.html" class="btn btn-sm btn-outline-warning">Inspect</a>
+      </div>
+      <div class="attention-item">
+        <div>
+          <div class="fw-semibold text-info"><i class="bi bi-megaphone me-1"></i> Results Awaiting Publication</div>
+          <div class="text-muted small">Scores finalized for 40/42 candidates. Ready to release.</div>
+        </div>
+        <a href="/evaluation/results/publish.html" class="btn btn-sm btn-outline-secondary">Publish</a>
+      </div>
+    </div>
+
+    <!-- Assigned Subjects Overview -->
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold m-0 text-dark"><i class="bi bi-book-half text-primary me-2"></i>My Assigned Subjects</h5>
+        <a href="/subjects/list.html" class="text-info small text-decoration-none">View All &rarr;</a>
+      </div>
+      <div class="d-flex flex-column gap-3">
+        <div class="p-3 rounded border section-bg">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <h6 class="fw-bold text-dark m-0">Database Management Systems</h6>
+            <span class="badge bg-light text-dark border">CS101</span>
+          </div>
+          <div class="text-muted small mb-2">4 Credits &bull; Semester 6 &bull; Computer Engineering</div>
+          <div class="d-flex gap-2">
+            <a href="/questions/list.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-collection me-1"></i>24 Questions</a>
+            <a href="/exams/list.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-calendar2 me-1"></i>2 Exams</a>
+          </div>
+        </div>
+
+        <div class="p-3 rounded border section-bg">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <h6 class="fw-bold text-dark m-0">Full Stack Web Development</h6>
+            <span class="badge bg-light text-dark border">CS102</span>
+          </div>
+          <div class="text-muted small mb-2">4 Credits &bull; Semester 6 &bull; Computer Engineering</div>
+          <div class="d-flex gap-2">
+            <a href="/questions/list.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-collection me-1"></i>18 Questions</a>
+            <a href="/exams/list.html" class="btn btn-sm btn-outline-secondary"><i class="bi bi-calendar2 me-1"></i>1 Exam</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+
+</body>
+</html>

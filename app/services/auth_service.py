@@ -43,12 +43,16 @@ def login(email, password):
     # Create Flask-Login session
     login_user(user)
 
+    # Create secure server-side session (anti-fixation & DB-backed)
+    from Session_Management.services.session_service import SessionService
+    user_session = SessionService.create_session(user)
+
     # Record successful login
     create_audit_log(
         user_id=user.UserID,
         action="LOGIN",
         status="SUCCESS",
-        details="User logged in successfully"
+        details=f"User logged in successfully with session {user_session.SessionID[:8]}..."
     )
 
     return {
@@ -60,8 +64,11 @@ def login(email, password):
             "email": user.Email,
             "first_name": user.FirstName,
             "last_name": user.LastName,
-            "role_id": user.RoleID
-        }
+            "role_id": user.RoleID,
+            "session_id": user_session.SessionID,
+            "expires_at": user_session.ExpiresAt.isoformat()
+        },
+        "session": user_session
     }
 
 

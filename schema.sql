@@ -13,6 +13,7 @@ DROP VIEW IF EXISTS vw_exam_statistics;
 DROP VIEW IF EXISTS vw_student_results;
 DROP VIEW IF EXISTS vw_question_paper;
 
+DROP TABLE IF EXISTS UserSession;
 DROP TABLE IF EXISTS AuditLog;
 DROP TABLE IF EXISTS Notification;
 DROP TABLE IF EXISTS Result;
@@ -415,6 +416,25 @@ CREATE INDEX idx_audit_user ON AuditLog(UserID);
 CREATE INDEX idx_audit_attempt ON AuditLog(ExamAttemptID);
 CREATE INDEX idx_audit_module_action ON AuditLog(Module, Action);
 CREATE INDEX idx_audit_created ON AuditLog(CreatedAt);
+
+-- 18. UserSession (Secure Session Management)
+CREATE TABLE UserSession (
+    SessionID VARCHAR(128) PRIMARY KEY,
+    UserID BIGINT NOT NULL,
+    IPAddress VARCHAR(45) NULL,
+    UserAgent VARCHAR(255) NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    LastActivityAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    ExpiresAt DATETIME NOT NULL,
+    IsRevoked BOOLEAN NOT NULL DEFAULT FALSE,
+    CONSTRAINT fk_session_user
+        FOREIGN KEY (UserID) REFERENCES User(UserID)
+        ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE INDEX idx_session_user ON UserSession(UserID);
+CREATE INDEX idx_session_expires ON UserSession(ExpiresAt);
+CREATE INDEX idx_session_active ON UserSession(IsRevoked, ExpiresAt);
 
 -- Initial RBAC roles
 INSERT INTO Role (RoleID, RoleName, Description) VALUES

@@ -186,3 +186,109 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// ============================================================================
+// Secure Session & Authentication Utilities
+// ============================================================================
+
+let _cachedCsrfToken = null;
+
+async function getCsrfToken() {
+  if (_cachedCsrfToken) return _cachedCsrfToken;
+  try {
+    const res = await fetch('/api/v1/auth/csrf-token', { credentials: 'include' });
+    if (res.ok) {
+      const json = await res.json();
+      _cachedCsrfToken = json.data?.csrf_token;
+      return _cachedCsrfToken;
+    }
+  } catch (err) {
+    console.warn('Could not fetch CSRF token:', err);
+  }
+  return null;
+}
+
+async function apiFetch(url, options = {}) {
+  const defaultHeaders = {
+    'Accept': 'application/json'
+  };
+
+  if (options.body && typeof options.body === 'object' && !(options.body instanceof FormData)) {
+    options.body = JSON.stringify(options.body);
+    defaultHeaders['Content-Type'] = 'application/json';
+  }
+
+  // Include CSRF token on state-modifying requests
+  const method = (options.method || 'GET').toUpperCase();
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    const csrf = await getCsrfToken();
+    if (csrf) {
+      defaultHeaders['X-CSRFToken'] = csrf;
+    }
+  }
+
+  options.headers = {
+    ...defaultHeaders,
+    ...options.headers
+  };
+
+  // Crucial: always include credentials so HttpOnly cookies are passed
+  options.credentials = 'include';
+
+  try {
+    const response = await fetch(url, options);
+
+    // Handle 401 Unauthorized (expired or missing session)
+    if (response.status === 401 && !window.location.pathname.includes('/auth/login')) {
+      showToast('Your session has expired. Redirecting to login...', 'warning');
+      setTimeout(() => {
+        window.location.href = '/auth/login.html?expired=true';
+      }, 1200);
+    }
+
+    return response;
+  } catch (error) {
+    console.error('API request failed:', error);
+    throw error;
+  }
+}
+
+const SessionAuth = {
+  async login(email, password) {
+    const response = await apiFetch('/api/v1/auth/login', {
+      method: 'POST',
+      body: { email, password }
+    });
+    return response.json();
+  },
+
+  async logout() {
+    try {
+      await apiFetch('/api/v1/auth/logout', { method: 'POST' });
+    } finally {
+      showToast('Logged out successfully', 'info');
+      setTimeout(() => {
+        window.location.href = '/auth/login.html';
+      }, 400);
+    }
+  },
+
+  async getCurrentSession() {
+    const response = await apiFetch('/api/v1/sessions/current');
+    if (!response.ok) return null;
+    return response.json();
+  },
+
+  async validateSession() {
+    const response = await apiFetch('/api/v1/sessions/validate');
+    if (!response.ok) return false;
+    const json = await response.json();
+    return json.data?.is_valid === true;
+  },
+
+  async refreshSession() {
+    const response = await apiFetch('/api/v1/sessions/refresh', { method: 'POST' });
+    return response.json();
+  }
+};
+
+

@@ -155,13 +155,50 @@
       }
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
-      showToast('Authenticating with Argon2id...', 'info');
-      setTimeout(() => {
-        window.location.href = targetUrl;
-      }, 500);
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Signing in...';
+
+      try {
+        const result = await SessionAuth.login(email, password);
+
+        if (result.success) {
+          showToast('Login successful! Secure session established.', 'success');
+
+          const roleId = result.data?.role_id;
+          let dest = targetUrl;
+          if (roleId === 1) dest = '/admin/dashboard.html';
+          else if (roleId === 2) dest = '/faculty/dashboard.html';
+          else if (roleId === 3) dest = '/student/dashboard.html';
+
+          setTimeout(() => {
+            window.location.href = dest;
+          }, 500);
+        } else {
+          showToast(result.message || 'Authentication failed', 'danger');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="bi bi-box-arrow-in-right"></i> Sign In to Portal';
+        }
+      } catch (err) {
+        // Fallback for demo prototype navigation
+        showToast('Demo mode: Redirecting to portal...', 'info');
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 500);
+      }
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('expired') === 'true') {
+        showToast('Your session has expired. Please sign in again.', 'warning');
+      }
+    });
   </script>
 </body>
 </html>

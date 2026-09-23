@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management - MMCOE Admin Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="sidebar-brand">
+      <i class="bi bi-mortarboard-fill"></i>
+      <span>MMCOE Exam</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-title">Administrator Portal</div>
+    <div class="nav-item">
+      <a href="/admin/dashboard.html" class="nav-link ">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/users/list.html" class="nav-link active">
+        <i class="bi bi-people-fill"></i>
+        <span>User Management</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/roles/permissions.html" class="nav-link ">
+        <i class="bi bi-shield-lock-fill"></i>
+        <span>RBAC Matrix</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/system/metrics.html" class="nav-link ">
+        <i class="bi bi-cpu-fill"></i>
+        <span>System Health & Flags</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/admin/audit/list.html" class="nav-link ">
+        <i class="bi bi-journal-text"></i>
+        <span>Audit Logs</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/reports/exam_report.html" class="nav-link ">
+        <i class="bi bi-graph-up-arrow"></i>
+        <span>Reports</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+    <div class="main-content">
+      <header class="top-navbar">
+  <div class="navbar-search">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Search exams, questions, subjects..." id="globalSearchInput">
+  </div>
+  <div class="navbar-actions">
+    <!-- Notification Bell Dropdown Button -->
+    <div class="dropdown me-2">
+      <button class="icon-btn" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow border bg-white p-0 mt-2" style="width: 340px;" aria-labelledby="notifDropdown">
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+          <h6 class="m-0 fw-bold text-dark">Notifications</h6>
+          <span class="badge bg-primary rounded-pill">3 New</span>
+        </div>
+        <div class="list-group list-group-flush small" style="max-height: 280px; overflow-y: auto;">
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-info"><i class="bi bi-award me-1"></i> Result Published</strong>
+              <small class="text-muted">10m ago</small>
+            </div>
+            <p class="mb-1 text-muted">Your result for DBMS Mid-Term Assessment is now available.</p>
+          </a>
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-warning"><i class="bi bi-clock me-1"></i> Exam Reminder</strong>
+              <small class="text-muted">1h ago</small>
+            </div>
+            <p class="mb-1 text-muted">Full Stack Web Development exam starts in 2 hours.</p>
+          </a>
+        </div>
+        <div class="p-2 text-center border-top">
+          <a href="/notifications/center.html" class="text-decoration-none small text-info fw-semibold">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <div class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="avatar" style="background: var(--mmcoe-maroon);">A</div>
+        <div class="user-info">
+          <span class="user-name">System Administrator</span>
+          <span class="user-role">Super Admin (ID: 1)</span>
+        </div>
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.75rem;"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow border mt-2">
+        <li><a class="dropdown-item" href="/admin/profile.html"><i class="bi bi-person-gear me-2"></i>Admin Profile</a></li>
+        <li><a class="dropdown-item" href="/admin/users/list.html"><i class="bi bi-people me-2"></i>User Management</a></li>
+          <li><a class="dropdown-item" href="/admin/system/metrics.html"><i class="bi bi-gear me-2"></i>Settings & Diagnostics</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/auth/login.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+      <main class="content-body">
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="/admin/dashboard.html">Admin</a></li>
+    <li class="breadcrumb-item active" aria-current="page">User Management</li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold m-0 text-dark">User Identity & Access Management</h3>
+    <p class="text-muted small m-0">Manage institutional accounts, role assignments, security states, and lockout resolutions</p>
+  </div>
+  <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#createUserModal">
+    <i class="bi bi-person-plus-fill"></i> Add New User
+  </button>
+</div>
+
+<!-- Filter and Search Toolbar -->
+<div class="glass-card p-3 mb-4">
+  <div class="row g-3 align-items-center">
+    <div class="col-md-4">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text bg-light text-muted"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control form-control-custom" id="userSearchInput" placeholder="Search by name, email, phone..." onkeyup="filterTable('usersTable', 'userSearchInput')">
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-2">
+      <select class="form-select form-select-sm form-control-custom" id="roleFilter" onchange="applyUserFilters()">
+        <option value="">All Roles</option>
+        <option value="Student">Student</option>
+        <option value="Faculty">Faculty</option>
+        <option value="Admin">Administrator</option>
+      </select>
+    </div>
+    <div class="col-sm-6 col-md-2">
+      <select class="form-select form-select-sm form-control-custom" id="statusFilter" onchange="applyUserFilters()">
+        <option value="">All Statuses</option>
+        <option value="Active">Active</option>
+        <option value="Inactive">Deactivated</option>
+      </select>
+    </div>
+    <div class="col-sm-6 col-md-2">
+      <select class="form-select form-select-sm form-control-custom" id="lockFilter" onchange="applyUserFilters()">
+        <option value="">Lock State</option>
+        <option value="Normal">Normal</option>
+        <option value="Locked">Locked Accounts</option>
+      </select>
+    </div>
+    <div class="col-sm-6 col-md-2 text-end">
+      <button class="btn btn-sm btn-outline-secondary w-100" onclick="resetUserFilters()">
+        <i class="bi bi-x-circle me-1"></i> Clear Filters
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Users Table Card -->
+<div class="glass-card p-4 mb-4">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle small" id="usersTable">
+      <thead>
+        <tr class="text-muted">
+          <th>User ID</th>
+          <th>Full Name</th>
+          <th>Email Address</th>
+          <th>Phone</th>
+          <th>Assigned Role</th>
+          <th>Security & Lock</th>
+          <th>Last Login</th>
+          <th>Account Status</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="user-row-1">
+          <td class="font-monospace fw-bold">#1</td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-shield-fill text-danger me-1"></i> System Administrator
+          </td>
+          <td>admin@platform.com</td>
+          <td>9876543210</td>
+          <td><span class="badge bg-danger">Admin</span></td>
+          <td><span class="badge bg-success"><i class="bi bi-unlock-fill"></i> Normal</span></td>
+          <td class="text-muted">Today, 03:00 PM</td>
+          <td><span class="status-badge badge-active">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="View Details" onclick="showUserDetails(1, 'System Administrator', 'admin@platform.com', 'Admin', 'Computer Eng', 'Active', 'Normal', 0, 'Today, 03:00 PM')"><i class="bi bi-eye"></i></button>
+            <a href="/admin/users/edit.html" class="btn btn-sm btn-outline-secondary me-1" title="Edit Profile"><i class="bi bi-pencil"></i></a>
+            <a href="/admin/users/login_history.html" class="btn btn-sm btn-outline-secondary" title="Login History"><i class="bi bi-clock-history"></i></a>
+          </td>
+        </tr>
+        <tr id="user-row-2">
+          <td class="font-monospace fw-bold">#2</td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-person-badge-fill text-info me-1"></i> Dr. Rajesh Sharma
+          </td>
+          <td>rajesh.sharma@college.edu</td>
+          <td>9876543211</td>
+          <td><span class="badge bg-info">Faculty</span></td>
+          <td><span class="badge bg-success"><i class="bi bi-unlock-fill"></i> Normal</span></td>
+          <td class="text-muted">Today, 02:15 PM</td>
+          <td><span class="status-badge badge-active">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="View Details" onclick="showUserDetails(2, 'Dr. Rajesh Sharma', 'rajesh.sharma@college.edu', 'Faculty', 'Computer Eng', 'Active', 'Normal', 0, 'Today, 02:15 PM')"><i class="bi bi-eye"></i></button>
+            <a href="/admin/users/edit.html" class="btn btn-sm btn-outline-secondary me-1" title="Edit Profile"><i class="bi bi-pencil"></i></a>
+            <button class="btn btn-sm btn-outline-warning me-1" title="Deactivate" onclick="toggleDeactivate(2, this)"><i class="bi bi-pause-fill"></i></button>
+            <a href="/admin/users/login_history.html" class="btn btn-sm btn-outline-secondary" title="Login History"><i class="bi bi-clock-history"></i></a>
+          </td>
+        </tr>
+        <tr id="user-row-3">
+          <td class="font-monospace fw-bold">#3</td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-mortarboard-fill text-success me-1"></i> Rutuja Ghodekar
+          </td>
+          <td>rutuja.student@college.edu</td>
+          <td>9876543212</td>
+          <td><span class="badge bg-success">Student</span></td>
+          <td><span class="badge bg-success"><i class="bi bi-unlock-fill"></i> Normal</span></td>
+          <td class="text-muted">Today, 02:45 PM</td>
+          <td><span class="status-badge badge-active">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="View Details" onclick="showUserDetails(3, 'Rutuja Ghodekar', 'rutuja.student@college.edu', 'Student', 'Computer Eng', 'Active', 'Normal', 0, 'Today, 02:45 PM')"><i class="bi bi-eye"></i></button>
+            <a href="/admin/users/edit.html" class="btn btn-sm btn-outline-secondary me-1" title="Edit Profile"><i class="bi bi-pencil"></i></a>
+            <button class="btn btn-sm btn-outline-warning me-1" title="Deactivate" onclick="toggleDeactivate(3, this)"><i class="bi bi-pause-fill"></i></button>
+            <a href="/admin/users/login_history.html" class="btn btn-sm btn-outline-secondary" title="Login History"><i class="bi bi-clock-history"></i></a>
+          </td>
+        </tr>
+        <tr id="user-row-4">
+          <td class="font-monospace fw-bold">#4</td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-mortarboard-fill text-success me-1"></i> Shlok Powar
+          </td>
+          <td>shlok.powar@college.edu</td>
+          <td>9876543213</td>
+          <td><span class="badge bg-success">Student</span></td>
+          <td><span class="badge bg-success"><i class="bi bi-unlock-fill"></i> Normal</span></td>
+          <td class="text-muted">Today, 02:40 PM</td>
+          <td><span class="status-badge badge-active">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="View Details" onclick="showUserDetails(4, 'Shlok Powar', 'shlok.powar@college.edu', 'Student', 'Computer Eng', 'Active', 'Normal', 0, 'Today, 02:40 PM')"><i class="bi bi-eye"></i></button>
+            <a href="/admin/users/edit.html" class="btn btn-sm btn-outline-secondary me-1" title="Edit Profile"><i class="bi bi-pencil"></i></a>
+            <button class="btn btn-sm btn-outline-warning me-1" title="Deactivate" onclick="toggleDeactivate(4, this)"><i class="bi bi-pause-fill"></i></button>
+            <a href="/admin/users/login_history.html" class="btn btn-sm btn-outline-secondary" title="Login History"><i class="bi bi-clock-history"></i></a>
+          </td>
+        </tr>
+        <tr id="user-row-5">
+          <td class="font-monospace fw-bold">#5</td>
+          <td class="fw-semibold text-dark">
+            <i class="bi bi-mortarboard-fill text-muted me-1"></i> Amit Deshmukh
+          </td>
+          <td>amit.deshmukh@college.edu</td>
+          <td>9876543214</td>
+          <td><span class="badge bg-success">Student</span></td>
+          <td><span class="badge bg-danger"><i class="bi bi-lock-fill"></i> Locked (5 Fails)</span></td>
+          <td class="text-muted">Yesterday</td>
+          <td><span class="status-badge badge-active">Active</span></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-success me-1" title="Unlock Account" onclick="unlockUser(5, this)"><i class="bi bi-unlock"></i> Unlock</button>
+            <button class="btn btn-sm btn-outline-info me-1" title="View Details" onclick="showUserDetails(5, 'Amit Deshmukh', 'amit.deshmukh@college.edu', 'Student', 'Computer Eng', 'Active', 'Locked (5 Attempts)', 5, 'Yesterday')"><i class="bi bi-eye"></i></button>
+            <a href="/admin/users/login_history.html" class="btn btn-sm btn-outline-secondary" title="Login History"><i class="bi bi-clock-history"></i></a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Bar -->
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center mt-3 pt-3 border-top small text-muted">
+    <span>Showing 1 to 5 of 1,248 accounts</span>
+    <nav aria-label="Page navigation">
+      <ul class="pagination pagination-sm m-0">
+        <li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item"><a class="page-link" href="#">4</a></li>
+        <li class="page-item"><a class="page-link" href="#">5</a></li>
+        <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+      </ul>
+    </nav>
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- Create User Modal -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content glass-card">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold text-dark" id="createUserModalLabel">
+          <i class="bi bi-person-plus-fill text-danger me-2"></i>Provision New Institutional Account
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form onsubmit="handleCreateUser(event)">
+        <div class="modal-body p-4">
+          <!-- Role Selector -->
+          <div class="mb-4">
+            <label class="form-label small fw-semibold text-dark">Select Account Role</label>
+            <div class="d-flex gap-3">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="accountType" id="typeStudent" value="Student" checked onchange="toggleRoleFields('Student')">
+                <label class="form-check-label fw-medium" for="typeStudent">Student</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="accountType" id="typeFaculty" value="Faculty" onchange="toggleRoleFields('Faculty')">
+                <label class="form-check-label fw-medium" for="typeFaculty">Faculty Member</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="accountType" id="typeAdmin" value="Admin" onchange="toggleRoleFields('Admin')">
+                <label class="form-check-label fw-medium" for="typeAdmin">System Administrator</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Common Fields -->
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">First Name</label>
+              <input type="text" class="form-control form-control-custom" placeholder="e.g. Rahul" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Last Name</label>
+              <input type="text" class="form-control form-control-custom" placeholder="e.g. Patil" required>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Institutional Email</label>
+              <input type="email" class="form-control form-control-custom" placeholder="username@college.edu" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Contact Phone Number</label>
+              <input type="tel" class="form-control form-control-custom" placeholder="10-digit mobile number" required>
+            </div>
+          </div>
+
+          <!-- Dynamic Role Fields: Student -->
+          <div id="studentFields" class="p-3 rounded border section-bg mb-3">
+            <div class="fw-bold small text-dark mb-2"><i class="bi bi-mortarboard me-1 text-success"></i> Academic Enrollment Details</div>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label small">Roll Number</label>
+                <input type="text" class="form-control form-control-sm form-control-custom" placeholder="e.g. 41101">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Enrollment PRN</label>
+                <input type="text" class="form-control form-control-sm form-control-custom" placeholder="e.g. EN20261002">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small">Semester</label>
+                <select class="form-select form-select-sm form-control-custom">
+                  <option>Sem 1</option><option>Sem 2</option><option>Sem 3</option><option>Sem 4</option>
+                  <option>Sem 5</option><option selected>Sem 6</option><option>Sem 7</option><option>Sem 8</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Role Fields: Faculty -->
+          <div id="facultyFields" class="p-3 rounded border section-bg mb-3 d-none">
+            <div class="fw-bold small text-dark mb-2"><i class="bi bi-person-badge me-1 text-info"></i> Faculty Employment Information</div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label small">Employee ID</label>
+                <input type="text" class="form-control form-control-sm form-control-custom" placeholder="e.g. FAC-2026-08">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small">Designation</label>
+                <input type="text" class="form-control form-control-sm form-control-custom" placeholder="e.g. Assistant Professor">
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Department</label>
+              <select class="form-select form-control-custom">
+                <option selected>Computer Engineering</option>
+                <option>Information Technology</option>
+                <option>Electronics & Telecommunication</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Temporary Password (Argon2id Hash)</label>
+              <input type="password" class="form-control form-control-custom" value="Welcome@MMCOE2026" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary-custom">Create & Activate Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- User Details Modal -->
+<div class="modal fade" id="userDetailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-person-vcard text-info me-2"></i>Account Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="text-center mb-4">
+          <div class="avatar mx-auto mb-2" id="detailAvatar" style="width:54px; height:54px; font-size:1.25rem;">A</div>
+          <h5 class="fw-bold m-0" id="detailName">User Name</h5>
+          <span class="badge bg-light text-dark border" id="detailRole">Role</span>
+        </div>
+        <div class="list-group list-group-flush small">
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">User ID</span>
+            <span class="fw-bold font-monospace" id="detailId">#1</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">Email</span>
+            <span class="fw-semibold" id="detailEmail">email@college.edu</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">Department</span>
+            <span id="detailDept">Computer Engineering</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">Account Status</span>
+            <span id="detailStatus" class="status-badge badge-active">Active</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">Security / Lock State</span>
+            <span id="detailLock" class="badge bg-success">Normal</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">Failed Logins</span>
+            <span id="detailFails">0</span>
+          </div>
+          <div class="list-group-item d-flex justify-content-between px-0">
+            <span class="text-muted">Last Authenticated</span>
+            <span id="detailLastLogin" class="text-muted">Today</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top">
+        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-outline-danger btn-sm" onclick="showToast('Password reset link sent to user email', 'success')"><i class="bi bi-key me-1"></i>Reset Password</button>
+      </div>
+    </div>
+  </div>
+</div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+<script>
+  function toggleRoleFields(role) {
+    document.getElementById('studentFields').classList.toggle('d-none', role !== 'Student');
+    document.getElementById('facultyFields').classList.toggle('d-none', role !== 'Faculty');
+  }
+
+  function handleCreateUser(e) {
+    e.preventDefault();
+    const modalEl = document.getElementById('createUserModal');
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) modal.hide();
+    showToast('New user provisioned and Argon2id credentials hashed successfully!', 'success');
+  }
+
+  function showUserDetails(id, name, email, role, dept, status, lock, fails, lastLogin) {
+    document.getElementById('detailId').textContent = '#' + id;
+    document.getElementById('detailName').textContent = name;
+    document.getElementById('detailEmail').textContent = email;
+    document.getElementById('detailRole').textContent = role;
+    document.getElementById('detailDept').textContent = dept;
+    document.getElementById('detailStatus').textContent = status;
+    document.getElementById('detailLock').textContent = lock;
+    document.getElementById('detailFails').textContent = fails;
+    document.getElementById('detailLastLogin').textContent = lastLogin;
+    document.getElementById('detailAvatar').textContent = name.charAt(0);
+
+    new bootstrap.Modal(document.getElementById('userDetailsModal')).show();
+  }
+
+  function toggleDeactivate(id, btn) {
+    const row = document.getElementById(`user-row-${id}`);
+    if (!row) return;
+    const isPaused = btn.classList.contains('btn-warning');
+    if (isPaused) {
+      if (confirm('Deactivate this account? User will not be able to log in, but historical examination records will be safely preserved.')) {
+        btn.classList.replace('btn-outline-warning', 'btn-outline-success');
+        btn.innerHTML = '<i class="bi bi-play-fill"></i>';
+        btn.title = 'Reactivate Account';
+        showToast('Account deactivated. Historical exam records preserved.', 'warning');
+      }
+    } else {
+      btn.classList.replace('btn-outline-success', 'btn-outline-warning');
+      btn.innerHTML = '<i class="bi bi-pause-fill"></i>';
+      btn.title = 'Deactivate Account';
+      showToast('Account reactivated successfully.', 'success');
+    }
+  }
+
+  function unlockUser(id, btn) {
+    const row = document.getElementById(`user-row-${id}`);
+    if (!row) return;
+    btn.remove();
+    showToast('Account unlocked successfully. Failed attempt counter reset.', 'success');
+  }
+
+  function applyUserFilters() {
+    const roleVal = document.getElementById('roleFilter').value.toLowerCase();
+    const statusVal = document.getElementById('statusFilter').value.toLowerCase();
+    const lockVal = document.getElementById('lockFilter').value.toLowerCase();
+
+    document.querySelectorAll('#usersTable tbody tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      let match = true;
+      if (roleVal && !text.includes(roleVal)) match = false;
+      if (statusVal && !text.includes(statusVal)) match = false;
+      if (lockVal === 'locked' && !text.includes('locked')) match = false;
+      if (lockVal === 'normal' && !text.includes('normal')) match = false;
+      row.style.display = match ? '' : 'none';
+    });
+  }
+
+  function resetUserFilters() {
+    document.getElementById('userSearchInput').value = '';
+    document.getElementById('roleFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('lockFilter').value = '';
+    document.querySelectorAll('#usersTable tbody tr').forEach(r => r.style.display = '');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Question Bank Repository - MMCOE Faculty Portal</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+  <div class="app-wrapper">
+    <aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="/" class="sidebar-brand">
+      <i class="bi bi-mortarboard-fill"></i>
+      <span>MMCOE Exam</span>
+    </a>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section-title">Faculty Portal</div>
+    <div class="nav-item">
+      <a href="/faculty/dashboard.html" class="nav-link ">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/questions/list.html" class="nav-link active">
+        <i class="bi bi-question-square-fill"></i>
+        <span>Question Bank</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/exams/list.html" class="nav-link ">
+        <i class="bi bi-card-checklist"></i>
+        <span>Exam Management</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/exams/monitor.html" class="nav-link ">
+        <i class="bi bi-display"></i>
+        <span>Live Monitoring</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/evaluation/pending.html" class="nav-link ">
+        <i class="bi bi-pencil-square"></i>
+        <span>Evaluations</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/subjects/list.html" class="nav-link ">
+        <i class="bi bi-book-fill"></i>
+        <span>My Assigned Subjects</span>
+      </a>
+    </div>
+    <div class="nav-item">
+      <a href="/reports/exam_report.html" class="nav-link ">
+        <i class="bi bi-bar-chart-line-fill"></i>
+        <span>Exam Analytics</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+    <div class="main-content">
+      <header class="top-navbar">
+  <div class="navbar-search">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Search exams, questions, subjects..." id="globalSearchInput">
+  </div>
+  <div class="navbar-actions">
+    <!-- Notification Bell Dropdown Button -->
+    <div class="dropdown me-2">
+      <button class="icon-btn" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      <div class="dropdown-menu dropdown-menu-end shadow border bg-white p-0 mt-2" style="width: 340px;" aria-labelledby="notifDropdown">
+        <div class="p-3 border-bottom d-flex align-items-center justify-content-between">
+          <h6 class="m-0 fw-bold text-dark">Notifications</h6>
+          <span class="badge bg-primary rounded-pill">3 New</span>
+        </div>
+        <div class="list-group list-group-flush small" style="max-height: 280px; overflow-y: auto;">
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-info"><i class="bi bi-award me-1"></i> Result Published</strong>
+              <small class="text-muted">10m ago</small>
+            </div>
+            <p class="mb-1 text-muted">Your result for DBMS Mid-Term Assessment is now available.</p>
+          </a>
+          <a href="/notifications/center.html" class="list-group-item list-group-item-action p-3">
+            <div class="d-flex w-100 justify-content-between mb-1">
+              <strong class="text-warning"><i class="bi bi-clock me-1"></i> Exam Reminder</strong>
+              <small class="text-muted">1h ago</small>
+            </div>
+            <p class="mb-1 text-muted">Full Stack Web Development exam starts in 2 hours.</p>
+          </a>
+        </div>
+        <div class="p-2 text-center border-top">
+          <a href="/notifications/center.html" class="text-decoration-none small text-info fw-semibold">View All Notifications</a>
+        </div>
+      </div>
+    </div>
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <div class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        <div class="avatar" style="background: var(--mmcoe-navy);">F</div>
+        <div class="user-info">
+          <span class="user-name">Dr. Rajesh Sharma</span>
+          <span class="user-role">Faculty (Comp Eng)</span>
+        </div>
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.75rem;"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow border mt-2">
+        <li><a class="dropdown-item" href="/faculty/profile.html"><i class="bi bi-person-badge me-2"></i>Faculty Profile</a></li>
+          <li><a class="dropdown-item" href="/reports/exam_report.html"><i class="bi bi-bar-chart-line me-2"></i>Performance Reports</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/auth/login.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+      <main class="content-body">
+<!-- Breadcrumbs -->
+<nav aria-label="breadcrumb" class="mb-3">
+  <ol class="breadcrumb small">
+    <li class="breadcrumb-item"><a href="/faculty/dashboard.html">Faculty</a></li>
+    <li class="breadcrumb-item active" aria-current="page">Question Bank</li>
+  </ol>
+</nav>
+
+<!-- Page Header -->
+<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+  <div>
+    <h3 class="fw-bold m-0 text-dark">Institutional Question Bank Repository</h3>
+    <p class="text-muted small m-0">Create, curate, and categorize reusable evaluation items across subjects and difficulty levels</p>
+  </div>
+  <div class="d-flex gap-2">
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#importCsvModal">
+      <i class="bi bi-file-earmark-spreadsheet-fill me-1"></i> Import CSV
+    </button>
+    <a href="/questions/create.html" class="btn btn-primary-custom">
+      <i class="bi bi-plus-lg"></i> Create New Question
+    </a>
+  </div>
+</div>
+
+<!-- Filters Toolbar -->
+<div class="glass-card p-3 mb-4">
+  <div class="row g-3 align-items-center">
+    <div class="col-md-4">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text bg-light text-muted"><i class="bi bi-search"></i></span>
+        <input type="text" class="form-control form-control-custom" id="qSearch" placeholder="Search question text, keyword..." onkeyup="filterQuestions()">
+      </div>
+    </div>
+    <div class="col-sm-6 col-md-2">
+      <select class="form-select form-select-sm form-control-custom" id="qSubjectFilter" onchange="filterQuestions()">
+        <option value="">All Subjects</option>
+        <option value="CS101">CS101 (DBMS)</option>
+        <option value="CS102">CS102 (Web Dev)</option>
+      </select>
+    </div>
+    <div class="col-sm-6 col-md-2">
+      <select class="form-select form-select-sm form-control-custom" id="qTypeFilter" onchange="filterQuestions()">
+        <option value="">All Types (MCQ & MSQ)</option>
+        <option value="MCQ">MCQ (Single Choice)</option>
+        <option value="MSQ">MSQ (Multiple Choice)</option>
+      </select>
+    </div>
+    <div class="col-sm-6 col-md-2">
+      <select class="form-select form-select-sm form-control-custom" id="qDifficultyFilter" onchange="filterQuestions()">
+        <option value="">All Difficulties</option>
+        <option value="Easy">Easy</option>
+        <option value="Medium">Medium</option>
+        <option value="Hard">Hard</option>
+      </select>
+    </div>
+    <div class="col-sm-6 col-md-2 text-end">
+      <button class="btn btn-sm btn-outline-secondary w-100" onclick="resetQFilters()">
+        <i class="bi bi-x-circle me-1"></i> Reset
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Questions Table Card -->
+<div class="glass-card p-4 mb-4">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle small mb-0" id="questionsTable">
+      <thead>
+        <tr class="text-muted border-bottom">
+          <th style="width: 5%;">ID</th>
+          <th style="width: 45%;">Question Statement & Metadata</th>
+          <th style="width: 10%;">Subject</th>
+          <th style="width: 10%;">Type</th>
+          <th style="width: 10%;">Difficulty</th>
+          <th style="width: 10%;">Default Marks</th>
+          <th style="width: 10%;" class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-subject="CS101" data-type="MCQ" data-diff="Easy">
+          <td class="font-monospace fw-bold">#1</td>
+          <td>
+            <div class="fw-semibold text-dark mb-1">Which SQL clause is used to filter records in a SELECT statement?</div>
+            <div class="text-muted" style="font-size: 0.75rem;">
+              <span class="badge bg-light text-dark border me-1">SQL Queries</span>
+              <span class="text-emerald"><i class="bi bi-lock-fill me-1"></i>Used in EXAM-DBMS-MID (Locked)</span>
+            </div>
+          </td>
+          <td><span class="badge bg-light text-dark border">CS101</span></td>
+          <td><span class="badge bg-primary">MCQ</span></td>
+          <td><span class="badge bg-success">Easy</span></td>
+          <td><strong class="text-dark font-monospace">2.00</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="Preview Question" onclick="previewQuestion('Which SQL clause is used to filter records in a SELECT statement?', 'MCQ', ['WHERE (Correct)', 'GROUP BY', 'ORDER BY', 'HAVING'], 'WHERE clause applies predicate row filtering.', 'CS101', 'Easy', 2.00)"><i class="bi bi-eye"></i></button>
+            <span title="Locked because used in published examination" data-bs-toggle="tooltip">
+              <button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-lock-fill"></i></button>
+            </span>
+          </td>
+        </tr>
+        <tr data-subject="CS101" data-type="MSQ" data-diff="Medium">
+          <td class="font-monospace fw-bold">#2</td>
+          <td>
+            <div class="fw-semibold text-dark mb-1">Which of the following are ACID properties in DBMS? (Select all that apply)</div>
+            <div class="text-muted" style="font-size: 0.75rem;">
+              <span class="badge bg-light text-dark border me-1">Database Architecture</span>
+              <span class="text-emerald"><i class="bi bi-lock-fill me-1"></i>Used in EXAM-DBMS-MID (Locked)</span>
+            </div>
+          </td>
+          <td><span class="badge bg-light text-dark border">CS101</span></td>
+          <td><span class="badge bg-purple" style="background-color: var(--accent-purple);">MSQ</span></td>
+          <td><span class="badge bg-warning text-dark">Medium</span></td>
+          <td><strong class="text-dark font-monospace">4.00</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="Preview Question" onclick="previewQuestion('Which of the following are ACID properties in DBMS? (Select all that apply)', 'MSQ', ['Atomicity (Correct)', 'Consistency (Correct)', 'Availability', 'Durability (Correct)'], 'ACID stands for Atomicity, Consistency, Isolation, Durability.', 'CS101', 'Medium', 4.00)"><i class="bi bi-eye"></i></button>
+            <span title="Locked because used in published examination" data-bs-toggle="tooltip">
+              <button class="btn btn-sm btn-outline-secondary" disabled><i class="bi bi-lock-fill"></i></button>
+            </span>
+          </td>
+        </tr>
+        <tr data-subject="CS102" data-type="MCQ" data-diff="Easy">
+          <td class="font-monospace fw-bold">#3</td>
+          <td>
+            <div class="fw-semibold text-dark mb-1">Which HTTP method is idempotent and used to retrieve resources?</div>
+            <div class="text-muted" style="font-size: 0.75rem;">
+              <span class="badge bg-light text-dark border me-1">REST Architecture</span>
+              <span class="text-muted"><i class="bi bi-pencil me-1"></i>Editable Pool Item</span>
+            </div>
+          </td>
+          <td><span class="badge bg-light text-dark border">CS102</span></td>
+          <td><span class="badge bg-primary">MCQ</span></td>
+          <td><span class="badge bg-success">Easy</span></td>
+          <td><strong class="text-dark font-monospace">2.00</strong></td>
+          <td class="text-end">
+            <button class="btn btn-sm btn-outline-info me-1" title="Preview Question" onclick="previewQuestion('Which HTTP method is idempotent and used to retrieve resources?', 'MCQ', ['GET (Correct)', 'POST', 'PATCH', 'CONNECT'], 'GET is safe and idempotent according to RFC 7231.', 'CS102', 'Easy', 2.00)"><i class="bi bi-eye"></i></button>
+            <a href="/questions/edit.html" class="btn btn-sm btn-outline-secondary" title="Edit Question"><i class="bi bi-pencil"></i></a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Question Preview Modal -->
+<div class="modal fade" id="questionPreviewModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-card">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold text-dark"><i class="bi bi-eye-fill text-info me-2"></i>Question Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <span class="badge bg-light text-dark border me-1" id="prevSubject">CS101</span>
+            <span class="badge bg-primary me-1" id="prevType">MCQ</span>
+            <span class="badge bg-success" id="prevDiff">Easy</span>
+          </div>
+          <span class="fw-bold font-monospace text-emerald" id="prevMarks">2.00 Marks</span>
+        </div>
+
+        <h6 class="fw-bold text-dark mb-3" id="prevStatement">Question statement...</h6>
+
+        <div class="mb-3">
+          <label class="form-label small text-muted fw-semibold">Options List:</label>
+          <div class="d-flex flex-column gap-2" id="prevOptionsContainer"></div>
+        </div>
+
+        <div class="p-3 rounded border section-bg small">
+          <strong class="text-dark"><i class="bi bi-info-circle me-1 text-info"></i> Explanation / Solution Key:</strong>
+          <p class="text-muted m-0 mt-1" id="prevExplanation">Explanation...</p>
+        </div>
+      </div>
+<!-- CSV Bulk Import Modal -->
+<div class="modal fade" id="importCsvModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content glass-card">
+      <div class="modal-header border-bottom">
+        <div>
+          <h5 class="modal-title fw-bold text-dark"><i class="bi bi-file-earmark-spreadsheet-fill text-primary me-2"></i>Bulk Import Questions from CSV</h5>
+          <span class="text-muted small">Supports normalized MCQ (Single Choice) and MSQ (Multiple Choice) question schemas</span>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <!-- Step 1: Template and Instructions -->
+        <div class="alert alert-info border-info d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3 mb-3">
+          <div>
+            <strong class="text-dark"><i class="bi bi-info-circle-fill me-1 text-info"></i> CSV Format Standard:</strong>
+            <div class="text-muted small mt-1">Columns: <code>type, question, subject, difficulty, option_a, option_b, option_c, option_d, correct_answer, marks, negative_marks, explanation</code></div>
+          </div>
+          <a href="/static/downloads/faculty_question_template.csv" download="faculty_question_template.csv" class="btn btn-sm btn-info text-white text-nowrap">
+            <i class="bi bi-download me-1"></i> Download Sample CSV
+          </a>
+        </div>
+
+        <!-- Drag & Drop Zone -->
+        <div class="csv-drop-zone mb-3" id="csvDropZone" onclick="document.getElementById('csvFileInput').click()">
+          <i class="bi bi-cloud-arrow-up-fill drop-icon"></i>
+          <h6 class="fw-bold text-dark mb-1">Drag and drop your question CSV file here</h6>
+          <p class="text-muted small mb-3">or click to browse from your computer (.csv files only)</p>
+          <span class="badge bg-light text-dark border px-3 py-2" id="fileChosenBadge"><i class="bi bi-filetype-csv me-1"></i> No file selected yet</span>
+          <input type="file" id="csvFileInput" accept=".csv" class="d-none" onchange="handleCsvFileSelected(event)">
+        </div>
+
+        <!-- Live Validation Alert Banner -->
+        <div id="validationBanner" class="alert alert-success d-none mb-3">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <strong id="validationTitle" class="text-success"><i class="bi bi-check-circle-fill me-1"></i> Questions Parsed Successfully</strong>
+            <span class="badge bg-light text-dark border" id="validationCountBadge">0 Valid Items</span>
+          </div>
+          <div class="d-flex gap-2 flex-wrap small">
+            <span class="badge bg-primary" id="mcqCountBadge">0 MCQ</span>
+            <span class="badge bg-purple" style="background-color: var(--accent-purple);" id="msqCountBadge">0 MSQ</span>
+            <span class="badge bg-danger d-none" id="errorCountBadge">0 Errors</span>
+          </div>
+        </div>
+
+        <!-- Parsed Questions Preview Table -->
+        <div id="previewContainer" class="d-none border rounded p-3 bg-light">
+          <h6 class="fw-bold text-dark mb-2 small"><i class="bi bi-table me-1"></i> Parsed Questions Preview:</h6>
+          <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+            <table class="table table-sm table-bordered bg-white align-middle small mb-0" id="previewTable">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Type</th>
+                  <th>Subject</th>
+                  <th>Question Statement</th>
+                  <th>Correct Key(s)</th>
+                  <th>Marks</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="previewTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-top">
+        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary-custom" id="btnImportConfirm" disabled onclick="confirmImportCsv()">
+          <i class="bi bi-check2-circle me-1"></i> Confirm & Import to Question Bank
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/js/app.js"></script>
+<script>
+  function previewQuestion(statement, type, options, explanation, subject, diff, marks) {
+    document.getElementById('prevStatement').textContent = statement;
+    document.getElementById('prevType').textContent = type;
+    document.getElementById('prevSubject').textContent = subject;
+    document.getElementById('prevDiff').textContent = diff;
+    document.getElementById('prevMarks').textContent = parseFloat(marks).toFixed(2) + ' Marks';
+    document.getElementById('prevExplanation').textContent = explanation;
+
+    const optContainer = document.getElementById('prevOptionsContainer');
+    optContainer.innerHTML = '';
+    options.forEach((opt, idx) => {
+      const letter = String.fromCharCode(65 + idx);
+      const isCorrect = opt.includes('(Correct)');
+      const text = opt.replace('(Correct)', '').trim();
+      const div = document.createElement('div');
+      div.className = `p-2 rounded border small d-flex align-items-center justify-content-between ${isCorrect ? 'bg-success bg-opacity-10 border-success' : 'bg-light'}`;
+      div.innerHTML = `
+        <span><strong class="badge-option-letter px-2 py-1 rounded me-2">${letter}</strong> ${text}</span>
+        ${isCorrect ? '<span class="badge bg-success">Correct Key</span>' : ''}
+      `;
+      optContainer.appendChild(div);
+    });
+
+    new bootstrap.Modal(document.getElementById('questionPreviewModal')).show();
+  }
+
+  function filterQuestions() {
+    const search = document.getElementById('qSearch').value.toLowerCase().trim();
+    const sub = document.getElementById('qSubjectFilter').value;
+    const type = document.getElementById('qTypeFilter').value;
+    const diff = document.getElementById('qDifficultyFilter').value;
+
+    document.querySelectorAll('#questionsTable tbody tr').forEach(row => {
+      const text = row.textContent.toLowerCase();
+      const rowSub = row.getAttribute('data-subject');
+      const rowType = row.getAttribute('data-type');
+      const rowDiff = row.getAttribute('data-diff');
+
+      let match = true;
+      if (search && !text.includes(search)) match = false;
+      if (sub && rowSub !== sub) match = false;
+      if (type && rowType !== type) match = false;
+      if (diff && rowDiff !== diff) match = false;
+
+      row.style.display = match ? '' : 'none';
+    });
+  }
+
+  function resetQFilters() {
+    document.getElementById('qSearch').value = '';
+    document.getElementById('qSubjectFilter').value = '';
+    document.getElementById('qTypeFilter').value = '';
+    document.getElementById('qDifficultyFilter').value = '';
+    document.querySelectorAll('#questionsTable tbody tr').forEach(r => r.style.display = '');
+  }
+
+  // CSV Drag & Drop and Processing
+  let parsedQuestionsBuffer = [];
+
+  const dropZone = document.getElementById('csvDropZone');
+  if (dropZone) {
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.add('dragover');
+      }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropZone.addEventListener(eventName, (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dropZone.classList.remove('dragover');
+      }, false);
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      if (files.length > 0) {
+        processCsvFile(files[0]);
+      }
+    }, false);
+  }
+
+  function handleCsvFileSelected(event) {
+    const file = event.target.files[0];
+    if (file) {
+      processCsvFile(file);
+    }
+  }
+
+  function parseCSVLine(line) {
+    const result = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const c = line[i];
+      if (c === '"') {
+        if (inQuotes && line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (c === ',' && !inQuotes) {
+        result.push(cur.trim());
+        cur = '';
+      } else {
+        cur += c;
+      }
+    }
+    result.push(cur.trim());
+    return result;
+  }
+
+  function processCsvFile(file) {
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      alert('Please upload a valid .csv file.');
+      return;
+    }
+
+    document.getElementById('fileChosenBadge').innerHTML = `<i class="bi bi-file-earmark-check-fill text-success me-1"></i> ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const text = e.target.result;
+      const lines = text.split(/\r\n|\n/).map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length < 2) {
+        alert('CSV file appears empty or contains only a header.');
+        return;
+      }
+
+      const header = parseCSVLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9_]/g, ''));
+      const colMap = {
+        type: header.findIndex(h => h.includes('type')),
+        question: header.findIndex(h => h.includes('question') || h.includes('statement')),
+        subject: header.findIndex(h => h.includes('subject')),
+        diff: header.findIndex(h => h.includes('diff')),
+        optA: header.findIndex(h => h === 'option_a' || h === 'optiona' || h === 'a'),
+        optB: header.findIndex(h => h === 'option_b' || h === 'optionb' || h === 'b'),
+        optC: header.findIndex(h => h === 'option_c' || h === 'optionc' || h === 'c'),
+        optD: header.findIndex(h => h === 'option_d' || h === 'optiond' || h === 'd'),
+        correct: header.findIndex(h => h.includes('correct') || h.includes('answer') || h.includes('key')),
+        marks: header.findIndex(h => h.includes('mark')),
+        explanation: header.findIndex(h => h.includes('exp') || h.includes('sol'))
+      };
+
+      parsedQuestionsBuffer = [];
+      let mcqCount = 0;
+      let msqCount = 0;
+      let errorCount = 0;
+
+      const tbody = document.getElementById('previewTableBody');
+      tbody.innerHTML = '';
+
+      for (let i = 1; i < lines.length; i++) {
+        const cols = parseCSVLine(lines[i]);
+        if (cols.length < 5) continue;
+
+        const rawType = (colMap.type !== -1 ? cols[colMap.type] : cols[0] || '').toUpperCase();
+        const question = (colMap.question !== -1 ? cols[colMap.question] : cols[1] || '').trim();
+        const subject = (colMap.subject !== -1 ? cols[colMap.subject] : cols[2] || 'CS101').trim();
+        const diff = (colMap.diff !== -1 ? cols[colMap.diff] : cols[3] || 'Medium').trim();
+        const optA = (colMap.optA !== -1 ? cols[colMap.optA] : cols[4] || '').trim();
+        const optB = (colMap.optB !== -1 ? cols[colMap.optB] : cols[5] || '').trim();
+        const optC = (colMap.optC !== -1 ? cols[colMap.optC] : cols[6] || '').trim();
+        const optD = (colMap.optD !== -1 ? cols[colMap.optD] : cols[7] || '').trim();
+        const correct = (colMap.correct !== -1 ? cols[colMap.correct] : cols[8] || '').toUpperCase().trim();
+        const marks = parseFloat(colMap.marks !== -1 ? cols[colMap.marks] : cols[9] || 2.0) || 2.0;
+        const explanation = (colMap.explanation !== -1 ? cols[colMap.explanation] : cols[11] || 'Standard key rationale.').trim();
+
+        // Strict Platform Rule: Only MCQ & MSQ allowed
+        let isValid = true;
+        let errorMsg = '';
+        if (rawType !== 'MCQ' && rawType !== 'MSQ') {
+          isValid = false;
+          errorMsg = 'Invalid type: Only MCQ and MSQ permitted';
+        } else if (!question) {
+          isValid = false;
+          errorMsg = 'Missing question statement';
+        } else if (!optA || !optB) {
+          isValid = false;
+          errorMsg = 'At least 2 options required';
+        } else if (!correct) {
+          isValid = false;
+          errorMsg = 'Correct answer missing';
+        }
+
+        if (isValid) {
+          if (rawType === 'MCQ') mcqCount++;
+          else msqCount++;
+
+          parsedQuestionsBuffer.push({
+            type: rawType,
+            question,
+            subject,
+            diff: diff.charAt(0).toUpperCase() + diff.slice(1).toLowerCase(),
+            options: [optA, optB, optC, optD].filter(Boolean),
+            correct,
+            marks: marks.toFixed(2),
+            explanation
+          });
+        } else {
+          errorCount++;
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="font-monospace text-muted">${i}</td>
+          <td><span class="badge ${rawType === 'MCQ' ? 'bg-primary' : (rawType === 'MSQ' ? 'bg-purple' : 'bg-secondary')}" ${rawType === 'MSQ' ? 'style="background-color: var(--accent-purple);"' : ''}>${rawType}</span></td>
+          <td><span class="badge bg-light text-dark border">${subject}</span></td>
+          <td class="text-truncate" style="max-width: 260px;" title="${question}">${question}</td>
+          <td><span class="badge bg-success bg-opacity-25 text-success border border-success">${correct}</span></td>
+          <td class="font-monospace">${marks.toFixed(2)}</td>
+          <td>${isValid ? '<span class="badge bg-success"><i class="bi bi-check-circle me-1"></i>Valid</span>' : `<span class="badge bg-danger" title="${errorMsg}"><i class="bi bi-exclamation-triangle me-1"></i>Error</span>`}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+
+      document.getElementById('validationBanner').classList.remove('d-none');
+      document.getElementById('previewContainer').classList.remove('d-none');
+      document.getElementById('validationCountBadge').textContent = `${parsedQuestionsBuffer.length} Valid Items`;
+      document.getElementById('mcqCountBadge').textContent = `${mcqCount} MCQ`;
+      document.getElementById('msqCountBadge').textContent = `${msqCount} MSQ`;
+
+      const errBadge = document.getElementById('errorCountBadge');
+      if (errorCount > 0) {
+        errBadge.textContent = `${errorCount} Skipped (Non-MCQ/MSQ)`;
+        errBadge.classList.remove('d-none');
+      } else {
+        errBadge.classList.add('d-none');
+      }
+
+      const btnConfirm = document.getElementById('btnImportConfirm');
+      if (parsedQuestionsBuffer.length > 0) {
+        btnConfirm.removeAttribute('disabled');
+      } else {
+        btnConfirm.setAttribute('disabled', 'true');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function confirmImportCsv() {
+    if (parsedQuestionsBuffer.length === 0) return;
+
+    const tbody = document.querySelector('#questionsTable tbody');
+    const existingCount = tbody.querySelectorAll('tr').length;
+
+    parsedQuestionsBuffer.forEach((q, idx) => {
+      const qNum = existingCount + idx + 1;
+      const diffBadge = q.diff === 'Easy' ? 'bg-success' : (q.diff === 'Hard' ? 'bg-danger' : 'bg-warning text-dark');
+      const typeBadge = q.type === 'MCQ' ? 'bg-primary' : 'bg-purple" style="background-color: var(--accent-purple);';
+
+      const correctLetters = q.correct.split(',').map(s => s.trim().toUpperCase());
+      const optLabels = q.options.map((opt, oIdx) => {
+        const letter = String.fromCharCode(65 + oIdx);
+        return correctLetters.includes(letter) ? `${opt} (Correct)` : opt;
+      });
+
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-subject', q.subject);
+      tr.setAttribute('data-type', q.type);
+      tr.setAttribute('data-diff', q.diff);
+      tr.className = 'table-success bg-opacity-10';
+
+      tr.innerHTML = `
+        <td class="font-monospace fw-bold">#${qNum}</td>
+        <td>
+          <div class="fw-semibold text-dark mb-1">${q.question}</div>
+          <div class="text-muted" style="font-size: 0.75rem;">
+            <span class="badge bg-light text-dark border me-1">${q.subject} Import</span>
+            <span class="badge bg-success bg-opacity-25 text-success border border-success"><i class="bi bi-file-earmark-spreadsheet me-1"></i>Imported via CSV</span>
+          </div>
+        </td>
+        <td><span class="badge bg-light text-dark border">${q.subject}</span></td>
+        <td><span class="badge ${typeBadge}">${q.type}</span></td>
+        <td><span class="badge ${diffBadge}">${q.diff}</span></td>
+        <td><strong class="text-dark font-monospace">${q.marks}</strong></td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-info me-1" title="Preview Question" onclick="previewQuestion('${q.question.replace(/'/g, "\\'")}', '${q.type}', ${JSON.stringify(optLabels).replace(/"/g, '&quot;')}, '${q.explanation.replace(/'/g, "\\'")}', '${q.subject}', '${q.diff}', ${q.marks})"><i class="bi bi-eye"></i></button>
+          <a href="/questions/edit.html" class="btn btn-sm btn-outline-secondary" title="Edit Question"><i class="bi bi-pencil"></i></a>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const modalEl = document.getElementById('importCsvModal');
+    const modalInstance = bootstrap.Modal.getInstance(modalEl);
+    if (modalInstance) modalInstance.hide();
+
+    const count = parsedQuestionsBuffer.length;
+    parsedQuestionsBuffer = [];
+
+    // Reset modal UI
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('fileChosenBadge').innerHTML = '<i class="bi bi-filetype-csv me-1"></i> No file selected yet';
+    document.getElementById('validationBanner').classList.add('d-none');
+    document.getElementById('previewContainer').classList.add('d-none');
+    document.getElementById('btnImportConfirm').setAttribute('disabled', 'true');
+
+    if (typeof showToast === 'function') {
+      showToast(`Successfully imported ${count} questions into the question repository!`, 'success');
+    } else {
+      alert(`Successfully imported ${count} questions into the question repository!`);
+    }
+  }
+</script>
+</body>
+</html>

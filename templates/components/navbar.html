@@ -1,0 +1,57 @@
+<header class="top-navbar">
+  <div class="navbar-search">
+    <i class="bi bi-search"></i>
+    <input type="text" placeholder="Search exams, questions, users, subjects..." id="globalSearchInput">
+  </div>
+
+  <div class="navbar-actions">
+    <!-- Notification Bell Dropdown Button -->
+    <div class="dropdown">
+      <button class="icon-btn" id="notifDropdown" data-bs-toggle="dropdown" aria-expanded="false" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="badge-dot"></span>
+      </button>
+      {% include 'components/notifications_dropdown.html' %}
+    </div>
+
+    <!-- User Profile Dropdown -->
+    <div class="dropdown">
+      <div class="user-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+        {% if request.path.startswith('/student') %}
+          <div class="avatar" style="background: var(--emerald);">R</div>
+          <div class="user-info">
+            <span class="user-name">Rutuja Ghodekar</span>
+            <span class="user-role">Student (TE Comp)</span>
+          </div>
+        {% elif request.path.startswith('/faculty') or request.path.startswith('/questions') or request.path.startswith('/exams') or request.path.startswith('/evaluation') %}
+          <div class="avatar" style="background: var(--mmcoe-navy);">F</div>
+          <div class="user-info">
+            <span class="user-name">Dr. Rajesh Sharma</span>
+            <span class="user-role">Faculty (Comp Eng)</span>
+          </div>
+        {% else %}
+          <div class="avatar" style="background: var(--mmcoe-maroon);">A</div>
+          <div class="user-info">
+            <span class="user-name">System Administrator</span>
+            <span class="user-role">Super Admin (ID: 1)</span>
+          </div>
+        {% endif %}
+        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 0.75rem;"></i>
+      </div>
+      <ul class="dropdown-menu dropdown-menu-end shadow border mt-2">
+        {% if request.path.startswith('/student') %}
+          <li><a class="dropdown-item" href="/student/profile.html"><i class="bi bi-person me-2"></i>My Student Profile</a></li>
+          <li><a class="dropdown-item" href="/student/history.html"><i class="bi bi-clock-history me-2"></i>Exam History</a></li>
+        {% elif request.path.startswith('/faculty') or request.path.startswith('/questions') or request.path.startswith('/exams') or request.path.startswith('/evaluation') %}
+          <li><a class="dropdown-item" href="/faculty/profile.html"><i class="bi bi-person-badge me-2"></i>Faculty Profile</a></li>
+          <li><a class="dropdown-item" href="/reports/exam_report.html"><i class="bi bi-bar-chart-line me-2"></i>Performance Reports</a></li>
+        {% else %}
+          <li><a class="dropdown-item" href="/admin/profile.html"><i class="bi bi-person-gear me-2"></i>Admin Profile</a></li>
+          <li><a class="dropdown-item" href="/admin/system/metrics.html"><i class="bi bi-gear me-2"></i>Settings & Diagnostics</a></li>
+        {% endif %}
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item text-danger" href="/auth/login.html"><i class="bi bi-box-arrow-right me-2"></i>Sign Out</a></li>
+      </ul>
+    </div>
+  </div>
+</header>

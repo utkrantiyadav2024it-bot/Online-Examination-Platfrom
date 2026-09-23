@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific ignores
+Online-Examination-Platfrom/
+cookies.txt
+Thumbs.db
+.DS_Store
